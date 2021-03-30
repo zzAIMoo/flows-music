@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "Z:\\Users\\Simone Sechi\\Desktop\\CLEAN FOLDER\\PROGRAMMING\\FLUTTER\\finto_spoti\\build\\app\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-night-v8\\values-night-v8.xml",
+            "outputFile": "Z:\\Users\\Simone Sechi\\Desktop\\CLEAN FOLDER\\PROGRAMMING\\FLUTTER\\finto-spoti\\build\\app\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-night-v8\\values-night-v8.xml",
             "map": [
                 {
-                    "source": "Z:\\Users\\Simone Sechi\\Desktop\\CLEAN FOLDER\\PROGRAMMING\\FLUTTER\\finto_spoti\\android\\app\\src\\main\\res\\values-night\\styles.xml",
+                    "source": "Z:\\Users\\Simone Sechi\\Desktop\\CLEAN FOLDER\\PROGRAMMING\\FLUTTER\\finto-spoti\\android\\app\\src\\main\\res\\values-night\\styles.xml",
                     "from": {
                         "startLines": "3,14",
                         "startColumns": "4,4",

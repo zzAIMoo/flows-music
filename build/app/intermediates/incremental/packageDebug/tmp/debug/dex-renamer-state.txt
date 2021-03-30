@@ -1,4 +1,4 @@
-#Mon Mar 08 14:12:55 CET 2021
-base.0=Z\:\\Users\\Simone Sechi\\Desktop\\CLEAN FOLDER\\PROGRAMMING\\FLUTTER\\finto_spoti\\build\\app\\intermediates\\dex\\debug\\mergeDexDebug\\classes.dex
+#Mon Mar 29 10:07:20 CEST 2021
+base.0=Z\:\\Users\\Simone Sechi\\Desktop\\CLEAN FOLDER\\PROGRAMMING\\FLUTTER\\finto-spoti\\build\\app\\intermediates\\dex\\debug\\mergeDexDebug\\classes.dex
 path.0=classes.dex
 renamed.0=classes.dex
