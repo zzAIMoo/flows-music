@@ -31,6 +31,8 @@ dependencies:
   flutter_tindercard: ^0.1.7
   # image: ^3.0.2
   flutter_svg: ^0.19.3
+  fluttertoast: ^8.0.3
+  http: ^0.13.1
 dev_dependencies:
   flutter_test:
     sdk: flutter
