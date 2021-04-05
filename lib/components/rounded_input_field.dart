@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'text_field_container.dart';
 
+// ignore: must_be_immutable
 class RoundedInputField extends StatelessWidget {
   final String hintText;
   final IconData icon;
   final ValueChanged<String> onChanged;
-  const RoundedInputField({
+  Color color;
+  InputBorder border;
+  RoundedInputField({
+    this.color,
+    this.border,
     Key key,
     this.hintText,
     this.icon = Icons.person,
@@ -17,14 +22,14 @@ class RoundedInputField extends StatelessWidget {
     return TextFieldContainer(
       child: TextField(
         onChanged: onChanged,
-        cursorColor: Color(0xFF6F35A5),
+        cursorColor: color,
         decoration: InputDecoration(
           icon: Icon(
             icon,
-            color: Color(0xFF6F35A5),
+            color: color,
           ),
           hintText: hintText,
-          border: InputBorder.none,
+          border: border,
         ),
       ),
     );

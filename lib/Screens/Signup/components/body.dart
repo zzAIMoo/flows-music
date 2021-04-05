@@ -12,12 +12,12 @@ import 'package:finto_spoti/components/rounded_password_field.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
+import 'dart:convert' as convert;
 
 // ignore: must_be_immutable
 class Body extends StatelessWidget {
-  bool isHidden = true;
-  bool isHidden2 = true;
-  String psw_1 = "", psw_2 = "";
+  bool isHidden = true, isHidden2 = true, emailValid = true;
+  String username = "", mail = "", psw_1 = "", psw_2 = "", email = "";
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -31,13 +31,28 @@ class Body extends StatelessWidget {
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             SizedBox(height: size.height * 0.03),
-            SvgPicture.asset(
+            /*SvgPicture.asset(
               "assets/icons/signup.svg",
               height: size.height * 0.35,
+            ),*/
+            RoundedInputField(
+              border: InputBorder.none,
+              color: Color(0xFF6F35A5),
+              hintText: "Your Username",
+              onChanged: (value) {
+                username = value;
+              },
             ),
             RoundedInputField(
+              border: InputBorder.none,
+              color: Color(0xFF6F35A5),
               hintText: "Your Email",
-              onChanged: (value) {},
+              onChanged: (value) {
+                emailValid = RegExp(
+                        r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                    .hasMatch(value);
+                email = value;
+              },
             ),
             RoundedPasswordField(
               onChanged: (value) {
@@ -64,7 +79,7 @@ class Body extends StatelessWidget {
             RoundedButton(
               text: "SIGNUP",
               textColor: Colors.white,
-              press: () {
+              press: () async {
                 if (psw_1 != psw_2) {
                   Fluttertoast.showToast(
                       msg: "Le password non coincidono",
@@ -74,7 +89,29 @@ class Body extends StatelessWidget {
                       backgroundColor: Colors.red,
                       textColor: Colors.white,
                       fontSize: 24.0);
-                } else {}
+                  return;
+                } else if (emailValid == false) {
+                  Fluttertoast.showToast(
+                      msg: "Formato email non valido",
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.CENTER,
+                      timeInSecForIosWeb: 2,
+                      backgroundColor: Colors.red,
+                      textColor: Colors.white,
+                      fontSize: 24.0);
+                  return;
+                }
+                var url = Uri.parse(
+                    'http://192.168.178.86/Flows_Progetto_Esame/API/registration/signup.php');
+                var response = await http.post(url, body: {
+                  'email': email,
+                  'username': username,
+                  'password': psw_1
+                });
+                print('Response status: ${response.statusCode}');
+                print('Response body: ${response.body}');
+                var responseParsed = convert.jsonDecode(response.body);
+                print(responseParsed["response_type"]);
               },
             ),
             SizedBox(height: size.height * 0.03),
@@ -95,14 +132,6 @@ class Body extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                SocalIcon(
-                  iconSrc: "assets/icons/facebook.svg",
-                  press: () {},
-                ),
-                SocalIcon(
-                  iconSrc: "assets/icons/twitter.svg",
-                  press: () {},
-                ),
                 SocalIcon(
                   iconSrc: "assets/icons/google-plus.svg",
                   press: () {},
