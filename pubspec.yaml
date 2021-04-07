@@ -33,6 +33,9 @@ dependencies:
   flutter_svg: ^0.19.3
   fluttertoast: ^8.0.3
   http: ^0.13.1
+  loading_animations: "^2.1.0"
+  shared_preferences: ^2.0.5
+  crypto: ^3.0.1
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:loading_animations/loading_animations.dart';
 
+// ignore: must_be_immutable
 class RoundedButton extends StatelessWidget {
   final String text;
   final Function press;
   final Color color, textColor;
+  bool isLoading;
   RoundedButton({
     Key key,
     this.text,
     this.press,
     this.color = const Color(0xFF6F35A5),
     this.textColor = Colors.white,
+    this.isLoading,
   }) : super(key: key);
 
   @override
@@ -23,10 +27,16 @@ class RoundedButton extends StatelessWidget {
         child: TextButton(
           style: flatButtonStyle,
           onPressed: press,
-          child: Text(
-            text,
-            style: TextStyle(color: textColor),
-          ),
+          child: !isLoading
+              ? Text(
+                  text,
+                  style: TextStyle(color: textColor),
+                )
+              : LoadingRotating.square(
+                  size: 10.0,
+                  borderColor: Colors.white,
+                  backgroundColor: Color(0xFF6F35A5),
+                ),
         ),
       ),
     );

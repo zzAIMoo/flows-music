@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 import 'text_field_container.dart';
 
+// ignore: must_be_immutable
 class RoundedPasswordField extends StatelessWidget {
   final ValueChanged<String> onChanged;
   final Function press;
   final bool hidden;
-  const RoundedPasswordField({
+  InputBorder border;
+  RoundedPasswordField({
     Key key,
     this.onChanged,
     this.press,
     this.hidden,
+    this.border,
   }) : super(key: key);
   @override
   Widget build(BuildContext context) {
@@ -28,7 +31,7 @@ class RoundedPasswordField extends StatelessWidget {
               onChanged: onChanged,
               cursorColor: Color(0xFF6F35A5),
               decoration: InputDecoration(
-                hintText: "Password",
+                hintText: "Password (min 9 char)",
                 icon: Icon(
                   Icons.lock,
                   color: Color(0xFF6F35A5),
@@ -38,7 +41,7 @@ class RoundedPasswordField extends StatelessWidget {
                   onPressed: press,
                   color: Color(0xFF6F35A5),
                 ),
-                border: InputBorder.none,
+                border: border,
               ),
             )));
   }
