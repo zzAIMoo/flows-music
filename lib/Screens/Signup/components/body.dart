@@ -157,14 +157,7 @@ class _BodyState extends State<Body> {
                   showToast("Lo username non può contenere spazi");
                   isUsernameValid = false;
                 } else if (psw_1.length < 8 /*|| psw_2.length < 8*/) {
-                  Fluttertoast.showToast(
-                      msg: "La password deve essere lunga almeno 8 caratteri",
-                      toastLength: Toast.LENGTH_SHORT,
-                      gravity: ToastGravity.CENTER,
-                      timeInSecForIosWeb: 2,
-                      backgroundColor: Colors.red,
-                      textColor: Colors.white,
-                      fontSize: 24.0);
+                  showToast("La password deve essere lunga almeno 8 caratteri");
                   isPassword1Valid = false;
 
                   /*if (psw_2.length < 8) isPassword2Valid = false;
