@@ -179,6 +179,7 @@ class _BodyState extends State<Body> {
                   showToast("Uno dei campi è vuoto");
                   return;
                 }
+                //probabilmente non lo userò più
                 /*if (psw_1 != psw_2) {
                   Fluttertoast.showToast(
                       msg: "Le password non coincidono",
