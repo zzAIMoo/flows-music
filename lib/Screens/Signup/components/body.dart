@@ -154,14 +154,7 @@ class _BodyState extends State<Body> {
               isLoading: requestStarted,
               press: () async {
                 if (username.contains(" ")) {
-                  Fluttertoast.showToast(
-                      msg: "Lo username non può contenere spazi",
-                      toastLength: Toast.LENGTH_SHORT,
-                      gravity: ToastGravity.CENTER,
-                      timeInSecForIosWeb: 2,
-                      backgroundColor: Colors.red,
-                      textColor: Colors.white,
-                      fontSize: 24.0);
+                  showToast("Lo username non può contenere spazi");
                   isUsernameValid = false;
                 } else if (psw_1.length < 8 /*|| psw_2.length < 8*/) {
                   Fluttertoast.showToast(
@@ -183,14 +176,7 @@ class _BodyState extends State<Body> {
                         psw_1 == "" /*||
                     psw_2 == ""*/
                     ) {
-                  Fluttertoast.showToast(
-                      msg: "Uno dei campi è vuoto",
-                      toastLength: Toast.LENGTH_SHORT,
-                      gravity: ToastGravity.CENTER,
-                      timeInSecForIosWeb: 2,
-                      backgroundColor: Colors.red,
-                      textColor: Colors.white,
-                      fontSize: 24.0);
+                  showToast("Uno dei campi è vuoto");
                   return;
                 }
                 /*if (psw_1 != psw_2) {
@@ -206,14 +192,7 @@ class _BodyState extends State<Body> {
                 }*/
                 else if (!emailValid) {
                   isEmailValid = false;
-                  Fluttertoast.showToast(
-                      msg: "Formato email non valido",
-                      toastLength: Toast.LENGTH_SHORT,
-                      gravity: ToastGravity.CENTER,
-                      timeInSecForIosWeb: 2,
-                      backgroundColor: Colors.red,
-                      textColor: Colors.white,
-                      fontSize: 24.0);
+                  showToast("Formato email non valido");
                   (context as Element).markNeedsBuild();
                   return;
                 }
@@ -232,27 +211,14 @@ class _BodyState extends State<Body> {
                   var responseParsed = convert.jsonDecode(response.body);
                   print(responseParsed["response_type"]);
                   if (responseParsed["response_type"] == "already_registered") {
-                    Fluttertoast.showToast(
-                        msg: "Mail/Username già utilizzati in un altro account",
-                        toastLength: Toast.LENGTH_SHORT,
-                        gravity: ToastGravity.CENTER,
-                        timeInSecForIosWeb: 2,
-                        backgroundColor: Colors.red,
-                        textColor: Colors.white,
-                        fontSize: 24.0);
+                    showToast(
+                        "Mail/Username già utilizzati in un altro account");
                     requestStarted = false;
                     (context as Element).markNeedsBuild();
                     return;
                   } else if (responseParsed["response_type"] == "email_error") {
-                    Fluttertoast.showToast(
-                        msg:
-                            "Ci sono problemi con i server, si è pregati di riprovare più tardi",
-                        toastLength: Toast.LENGTH_SHORT,
-                        gravity: ToastGravity.CENTER,
-                        timeInSecForIosWeb: 2,
-                        backgroundColor: Colors.red,
-                        textColor: Colors.white,
-                        fontSize: 24.0);
+                    showToast(
+                        "Ci sono problemi con i server, si è pregati di riprovare più tardi");
                     requestStarted = false;
                     (context as Element).markNeedsBuild();
                     return;
@@ -312,5 +278,16 @@ class _BodyState extends State<Body> {
         ),
       ),
     );
+  }
+
+  void showToast(String message) {
+    Fluttertoast.showToast(
+        msg: message,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 2,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 24.0);
   }
 }
