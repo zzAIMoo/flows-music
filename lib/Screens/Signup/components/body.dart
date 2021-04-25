@@ -19,16 +19,23 @@ import 'dart:convert' as convert;
 import 'package:flutter_svg/flutter_svg.dart';
 
 // ignore: must_be_immutable
-class Body extends StatelessWidget {
+class Body extends StatefulWidget {
+  @override
+  _BodyState createState() => _BodyState();
+}
+
+class _BodyState extends State<Body> {
   bool isHidden_1 = true,
       isHidden_2 = true,
       emailValid = true,
       wantsToSavePassword = false,
       requestStarted = false;
+
   bool isUsernameValid = true,
       isEmailValid = true,
       isPassword1Valid = true,
       isPassword2Valid = true;
+
   String username = "", mail = "", psw_1 = "", psw_2 = "", email = "";
 
   @override
@@ -48,7 +55,11 @@ class Body extends StatelessWidget {
               "assets/icons/signup.svg",
               height: size.height * 0.35,
             ),*/
+
+            //TODO: https://api.flutter.dev/flutter/material/TextFormField-class.html
+
             RoundedInputField(
+              inputType: TextInputType.text,
               border: isUsernameValid
                   ? InputBorder.none
                   : OutlineInputBorder(
@@ -56,13 +67,15 @@ class Body extends StatelessWidget {
                       borderRadius: BorderRadius.circular(25.0),
                     ),
               color: Color(0xFF6F35A5),
-              hintText: "Your Username",
+              hintText: "Your Username (no spaces)",
               onChanged: (value) {
                 username = value;
               },
             ),
             RoundedInputField(
-              border: isEmailValid
+              icon: Icons.email_rounded,
+              inputType: TextInputType.emailAddress,
+              border: emailValid
                   ? InputBorder.none
                   : OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.red, width: 50.0),
@@ -79,7 +92,7 @@ class Body extends StatelessWidget {
             ),
             RoundedPasswordField(
               hidden: isHidden_1,
-              border: isPassword2Valid
+              border: isPassword1Valid
                   ? InputBorder.none
                   : OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.red, width: 50.0),
@@ -88,7 +101,9 @@ class Body extends StatelessWidget {
               onChanged: (value) {
                 psw_1 = value;
                 if (value.length < 8) {
-                  isPassword1Valid = false;
+                  setState(() {
+                    isPassword1Valid = false;
+                  });
                   return;
                 }
               },
@@ -97,7 +112,7 @@ class Body extends StatelessWidget {
                 (context as Element).markNeedsBuild();
               },
             ),
-            RoundedPasswordField(
+            /*RoundedPasswordField(
               hidden: isHidden_2,
               border: isPassword2Valid
                   ? InputBorder.none
@@ -116,7 +131,7 @@ class Body extends StatelessWidget {
                 isHidden_2 = !isHidden_2;
                 (context as Element).markNeedsBuild();
               },
-            ),
+            ),*/
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -138,7 +153,17 @@ class Body extends StatelessWidget {
               textColor: Colors.white,
               isLoading: requestStarted,
               press: () async {
-                if (psw_1.length < 8 || psw_2.length < 8) {
+                if (username.contains(" ")) {
+                  Fluttertoast.showToast(
+                      msg: "Lo username non può contenere spazi",
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.CENTER,
+                      timeInSecForIosWeb: 2,
+                      backgroundColor: Colors.red,
+                      textColor: Colors.white,
+                      fontSize: 24.0);
+                  isUsernameValid = false;
+                } else if (psw_1.length < 8 /*|| psw_2.length < 8*/) {
                   Fluttertoast.showToast(
                       msg: "La password deve essere lunga almeno 8 caratteri",
                       toastLength: Toast.LENGTH_SHORT,
@@ -147,16 +172,17 @@ class Body extends StatelessWidget {
                       backgroundColor: Colors.red,
                       textColor: Colors.white,
                       fontSize: 24.0);
-                  if (psw_1.length < 8) isPassword1Valid = false;
+                  isPassword1Valid = false;
 
-                  if (psw_2.length < 8) isPassword2Valid = false;
+                  /*if (psw_2.length < 8) isPassword2Valid = false;
                   (context as Element).markNeedsBuild();
-                  return;
+                  return;*/
                 }
                 if (username == "" ||
-                    email == "" ||
-                    psw_1 == "" ||
-                    psw_2 == "") {
+                        email == "" ||
+                        psw_1 == "" /*||
+                    psw_2 == ""*/
+                    ) {
                   Fluttertoast.showToast(
                       msg: "Uno dei campi è vuoto",
                       toastLength: Toast.LENGTH_SHORT,
@@ -167,7 +193,7 @@ class Body extends StatelessWidget {
                       fontSize: 24.0);
                   return;
                 }
-                if (psw_1 != psw_2) {
+                /*if (psw_1 != psw_2) {
                   Fluttertoast.showToast(
                       msg: "Le password non coincidono",
                       toastLength: Toast.LENGTH_SHORT,
@@ -177,7 +203,8 @@ class Body extends StatelessWidget {
                       textColor: Colors.white,
                       fontSize: 24.0);
                   return;
-                } else if (emailValid == false) {
+                }*/
+                else if (!emailValid) {
                   isEmailValid = false;
                   Fluttertoast.showToast(
                       msg: "Formato email non valido",
@@ -243,9 +270,16 @@ class Body extends StatelessWidget {
                     (context as Element).markNeedsBuild();
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (context) => EmailConfirm()),
+                      MaterialPageRoute(builder: (context) => LoginScreen()),
                     );
-                    return;
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text('Email di verifica inviata!'),
+                      behavior: SnackBarBehavior.floating,
+                      /*action: SnackBarAction(
+                        label: 'Undo',
+                        onPressed: () {},
+                      ),*/
+                    ));
                   }
                 }
               },

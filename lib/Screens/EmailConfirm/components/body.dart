@@ -18,6 +18,7 @@ class _BodyPageState extends State<BodyPage> {
     Timer.periodic(new Duration(seconds: 1), (timer) async {
       var url = Uri.parse(
           'http://192.168.178.86/Flows_Progetto_Esame/API/registration/checkVerified.php');
+      // ignore: unused_local_variable
       var response = await http.post(url, body: {});
     });
   }
