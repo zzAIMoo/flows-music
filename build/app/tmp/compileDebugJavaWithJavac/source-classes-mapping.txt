@@ -1,4 +1,0 @@
-io/flutter/plugins/GeneratedPluginRegistrant.java
- io.flutter.plugins.GeneratedPluginRegistrant
-com/example/finto_spoti/BuildConfig.java
- com.example.finto_spoti.BuildConfig
