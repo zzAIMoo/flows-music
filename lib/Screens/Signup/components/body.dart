@@ -9,7 +9,6 @@ import 'package:finto_spoti/components/already_have_an_account_acheck.dart';
 import 'package:finto_spoti/components/rounded_button.dart';
 import 'package:finto_spoti/components/rounded_input_field.dart';
 import 'package:finto_spoti/components/rounded_password_field.dart';
-import 'package:finto_spoti/Screens/EmailConfirm/email_confirm_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:crypto/crypto.dart';
 import 'package:fluttertoast/fluttertoast.dart';

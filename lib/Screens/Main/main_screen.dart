@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tindercard/flutter_tindercard.dart';
+import 'components/search_screen.dart';
 //import 'package:image/image.dart' as IMG;
 
 void main() {
@@ -116,10 +117,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       : Container(),
         ],
       ),
-      Text(
-        'Index 2: Giocatori',
-        style: optionStyle,
-      ),
+      SearchScreen(),
       Card(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -161,47 +159,6 @@ class _MyHomePageState extends State<MyHomePage> {
     "https://images.unsplash.com/photo-1613066839141-4489f60e0389?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=634&q=80"
   ];
   int _selectedIndex = 0;
-  static const TextStyle optionStyle =
-      TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
-  // ignore: unused_field
-  static List<Widget> _widgetOptions = <Widget>[
-    Card(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          const ListTile(
-            leading: Icon(Icons.album),
-            title: Text('The Enchanted Nightingale'),
-            subtitle: Text('Music by Julie Gable. Lyrics by Sidney Stein.'),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: <Widget>[
-              TextButton(
-                child: const Text('BUY TICKETS'),
-                onPressed: () {/* ... */},
-              ),
-              const SizedBox(width: 8),
-              TextButton(
-                child: const Text('LISTEN'),
-                onPressed: () {/* ... */},
-              ),
-              const SizedBox(width: 8),
-            ],
-          ),
-        ],
-      ),
-    ),
-    Text(
-      'Index 1: Utenti',
-      style: optionStyle,
-    ),
-    Text(
-      'Index 2: School',
-      style: optionStyle,
-    ),
-  ];
-
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
