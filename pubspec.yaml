@@ -38,6 +38,7 @@ dependencies:
   crypto: ^3.0.1
   youtube_api: ^0.8.0
   flutter_search_bar: ^2.1.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

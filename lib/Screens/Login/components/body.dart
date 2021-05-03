@@ -5,6 +5,11 @@ import 'package:finto_spoti/components/already_have_an_account_acheck.dart';
 import 'package:finto_spoti/components/rounded_button.dart';
 import 'package:finto_spoti/components/rounded_input_field.dart';
 import 'package:finto_spoti/components/rounded_password_field.dart';
+import 'package:finto_spoti/Screens/Main/main_screen.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert' as convert;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_svg/svg.dart';
 
 // ignore: must_be_immutable
@@ -18,15 +23,9 @@ class Body extends StatefulWidget {
 }
 
 class _BodyState extends State<Body> {
-  bool isHidden = true,
-      wantsToSavePassword = false,
-      isEmailValid = true,
-      emailValid = true,
-      isHidden_1 = false,
-      isPassword1Valid = true,
-      requestStarted = false;
+  bool isHidden = true, wantsToSavePassword = false, requestStarted = false;
 
-  String email = "", psw_1 = "";
+  String email = "", psw = "";
 
   @override
   Widget build(BuildContext context) {
@@ -49,39 +48,22 @@ class _BodyState extends State<Body> {
             RoundedInputField(
               icon: Icons.email_rounded,
               inputType: TextInputType.emailAddress,
-              border: isEmailValid
-                  ? InputBorder.none
-                  : OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.red, width: 50.0),
-                      borderRadius: BorderRadius.circular(25.0),
-                    ),
+              border: InputBorder.none,
               color: Color(0xFF6F35A5),
               hintText: "Your Email",
               onChanged: (value) {
-                emailValid = RegExp(
-                        r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                    .hasMatch(value);
                 email = value;
               },
             ),
             RoundedPasswordField(
-              hidden: isHidden_1,
-              border: isPassword1Valid
-                  ? InputBorder.none
-                  : OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.red, width: 50.0),
-                      borderRadius: BorderRadius.circular(25.0),
-                    ),
+              hidden: isHidden,
+              border: InputBorder.none,
               onChanged: (value) {
-                psw_1 = value;
-                if (psw_1.length < 8) {
-                  isPassword1Valid = false;
-                  return;
-                }
+                psw = value;
               },
               press: () {
-                isHidden_1 = !isHidden_1;
-                (context as Element).markNeedsBuild();
+                isHidden = !isHidden;
+                setState(() {});
               },
             ),
             Row(
@@ -95,16 +77,61 @@ class _BodyState extends State<Body> {
                   value: wantsToSavePassword,
                   onChanged: (newValue) {
                     wantsToSavePassword = newValue;
-                    (context as Element).markNeedsBuild();
+                    setState(() {});
                   },
                 ),
               ],
             ),
             RoundedButton(
-              textColor: Colors.white,
               text: "LOGIN",
+              textColor: Colors.white,
               isLoading: requestStarted,
-              press: () {},
+              press: () async {
+                requestStarted = true;
+                setState(() {});
+                var url = Uri.parse(
+                    'https://sechisimone.altervista.org/flows/API/registration/signin.php');
+                var response = await http
+                    .post(url, body: {'email': email, 'password': psw});
+                print('Response status: ${response.statusCode}');
+                print('Response body: ${response.body}');
+                if (response.statusCode == 200) {
+                  print(response.body);
+                  var responseParsed = convert.jsonDecode(response.body);
+                  print(responseParsed["response_type"]);
+                  if (responseParsed["response_type"] == "already_registered") {
+                    showToast(
+                        "Mail/Username già utilizzati in un altro account");
+                    requestStarted = false;
+                    setState(() {});
+                    return;
+                  } else if (responseParsed["response_type"] == "email_error") {
+                    showToast(
+                        "Ci sono problemi con i server, si è pregati di riprovare più tardi");
+                    requestStarted = false;
+                    setState(() {});
+                    return;
+                  } else if (responseParsed["response_type"] ==
+                      "loggedin_correctly") {
+                    if (wantsToSavePassword) {
+                      // ignore: invalid_use_of_visible_for_testing_member
+                      SharedPreferences.setMockInitialValues({});
+                      SharedPreferences prefs =
+                          await SharedPreferences.getInstance();
+                      prefs.setString("refresh_token",
+                          responseParsed["response_body"]["refresh_token"]);
+                      prefs.setString("access_token",
+                          responseParsed["response_body"]["access_token"]);
+                    }
+                    requestStarted = false;
+                    setState(() {});
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => HomePage()),
+                    );
+                  }
+                }
+              },
             ),
             SizedBox(height: size.height * 0.03),
             AlreadyHaveAnAccountCheck(
@@ -123,5 +150,16 @@ class _BodyState extends State<Body> {
         ),
       ),
     );
+  }
+
+  void showToast(String message) {
+    Fluttertoast.showToast(
+        msg: message,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 2,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 24.0);
   }
 }

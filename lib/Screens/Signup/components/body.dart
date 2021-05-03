@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:finto_spoti/Screens/Login/login_screen.dart';
 import 'package:finto_spoti/Screens/Signup/components/background.dart';
@@ -9,8 +7,6 @@ import 'package:finto_spoti/components/already_have_an_account_acheck.dart';
 import 'package:finto_spoti/components/rounded_button.dart';
 import 'package:finto_spoti/components/rounded_input_field.dart';
 import 'package:finto_spoti/components/rounded_password_field.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:crypto/crypto.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
@@ -24,18 +20,10 @@ class Body extends StatefulWidget {
 }
 
 class _BodyState extends State<Body> {
-  bool isHidden_1 = true,
-      isHidden_2 = true,
-      emailValid = true,
-      wantsToSavePassword = false,
-      requestStarted = false;
+  bool isHidden = true,
+      requestStarted = false, isUsernameValid = true, isEmailValid = true, isPasswordValid = true;
 
-  bool isUsernameValid = true,
-      isEmailValid = true,
-      isPassword1Valid = true,
-      isPassword2Valid = true;
-
-  String username = "", mail = "", psw_1 = "", psw_2 = "", email = "";
+  String username = "", mail = "", psw = "", email = "";
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +62,7 @@ class _BodyState extends State<Body> {
             RoundedInputField(
               icon: Icons.email_rounded,
               inputType: TextInputType.emailAddress,
-              border: emailValid
+              border: isEmailValid
                   ? InputBorder.none
                   : OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.red, width: 50.0),
@@ -83,69 +71,33 @@ class _BodyState extends State<Body> {
               color: Color(0xFF6F35A5),
               hintText: "Your Email",
               onChanged: (value) {
-                emailValid = RegExp(
+                isEmailValid = RegExp(
                         r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
                     .hasMatch(value);
                 email = value;
               },
             ),
             RoundedPasswordField(
-              hidden: isHidden_1,
-              border: isPassword1Valid
+              hidden: isHidden,
+              border: isPasswordValid
                   ? InputBorder.none
                   : OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.red, width: 50.0),
                       borderRadius: BorderRadius.circular(25.0),
                     ),
               onChanged: (value) {
-                psw_1 = value;
+                psw = value;
                 if (value.length < 8) {
                   setState(() {
-                    isPassword1Valid = false;
+                    isPasswordValid = false;
                   });
                   return;
                 }
               },
               press: () {
-                isHidden_1 = !isHidden_1;
-                (context as Element).markNeedsBuild();
+                isHidden = !isHidden;
+                setState(() {});
               },
-            ),
-            /*RoundedPasswordField(
-              hidden: isHidden_2,
-              border: isPassword2Valid
-                  ? InputBorder.none
-                  : OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.red, width: 50.0),
-                      borderRadius: BorderRadius.circular(25.0),
-                    ),
-              onChanged: (value) {
-                psw_2 = value;
-                if (value.length < 8) {
-                  isPassword2Valid = false;
-                  return;
-                }
-              },
-              press: () {
-                isHidden_2 = !isHidden_2;
-                (context as Element).markNeedsBuild();
-              },
-            ),*/
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text("Salva Credenziali"),
-                Checkbox(
-                  fillColor: MaterialStateColor.resolveWith(
-                      (states) => Color(0xFF6F35A5)),
-                  checkColor: Colors.white,
-                  value: wantsToSavePassword,
-                  onChanged: (newValue) {
-                    wantsToSavePassword = newValue;
-                    (context as Element).markNeedsBuild();
-                  },
-                ),
-              ],
             ),
             RoundedButton(
               text: "SIGNUP",
@@ -155,9 +107,9 @@ class _BodyState extends State<Body> {
                 if (username.contains(" ")) {
                   showToast("Lo username non può contenere spazi");
                   isUsernameValid = false;
-                } else if (psw_1.length < 8 /*|| psw_2.length < 8*/) {
+                } else if (psw.length < 8 /*|| psw_2.length < 8*/) {
                   showToast("La password deve essere lunga almeno 8 caratteri");
-                  isPassword1Valid = false;
+                  isPasswordValid = false;
 
                   /*if (psw_2.length < 8) isPassword2Valid = false;
                   (context as Element).markNeedsBuild();
@@ -165,7 +117,7 @@ class _BodyState extends State<Body> {
                 }
                 if (username == "" ||
                         email == "" ||
-                        psw_1 == "" /*||
+                        psw == "" /*||
                     psw_2 == ""*/
                     ) {
                   showToast("Uno dei campi è vuoto");
@@ -183,7 +135,7 @@ class _BodyState extends State<Body> {
                       fontSize: 24.0);
                   return;
                 }*/
-                else if (!emailValid) {
+                else if (!isEmailValid) {
                   isEmailValid = false;
                   showToast("Formato email non valido");
                   (context as Element).markNeedsBuild();
@@ -192,11 +144,11 @@ class _BodyState extends State<Body> {
                 requestStarted = true;
                 (context as Element).markNeedsBuild();
                 var url = Uri.parse(
-                    'http://192.168.178.86/Flows_Progetto_Esame/API/registration/signup.php');
+                    'https://sechisimone.altervista.org/flows/API/registration/signup.php');
                 var response = await http.post(url, body: {
                   'email': email,
                   'username': username,
-                  'password': psw_1
+                  'password': psw
                 });
                 print('Response status: ${response.statusCode}');
                 print('Response body: ${response.body}');
@@ -216,15 +168,6 @@ class _BodyState extends State<Body> {
                     (context as Element).markNeedsBuild();
                     return;
                   } else if (responseParsed["response_type"] == "email_sent") {
-                    if (wantsToSavePassword) {
-                      // ignore: invalid_use_of_visible_for_testing_member
-                      SharedPreferences.setMockInitialValues({});
-                      SharedPreferences prefs =
-                          await SharedPreferences.getInstance();
-                      prefs.setString('email', email);
-                      prefs.setString('pass',
-                          sha256.convert(utf8.encode(psw_1)).toString());
-                    }
                     requestStarted = false;
                     (context as Element).markNeedsBuild();
                     Navigator.pushReplacement(

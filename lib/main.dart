@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:finto_spoti/Screens/Signup/signup_screen.dart';
+import 'package:finto_spoti/Screens/Login/login_screen.dart';
 
 void main() => runApp(MyApp());
 
@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
         primaryColor: Color(0xFF6F35A5),
         scaffoldBackgroundColor: Colors.white,
       ),
-      home: SignUpScreen(),
+      home: LoginScreen(),
     );
   }
 }

@@ -16,7 +16,6 @@ class _BodyPageState extends State<BodyPage> {
   void initState() {
     super.initState();
     Timer.periodic(new Duration(seconds: 1), (timer) async {
-      //TODO cambiare link in quelli di altervista
       var url = Uri.parse(
           'http://192.168.178.86/Flows_Progetto_Esame/API/registration/checkVerified.php');
       // ignore: unused_local_variable
