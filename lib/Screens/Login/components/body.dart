@@ -113,13 +113,13 @@ class _BodyState extends State<Body> {
                     return;
                   } else if (responseParsed["response_type"] ==
                       "loggedin_correctly") {
+                    // ignore: invalid_use_of_visible_for_testing_member
+                    SharedPreferences.setMockInitialValues({});
+                    SharedPreferences prefs =
+                        await SharedPreferences.getInstance();
+                    prefs.setString('access_token',
+                        responseParsed["response_body"]["access_token"]);
                     if (wantsToSavePassword) {
-                      // ignore: invalid_use_of_visible_for_testing_member
-                      SharedPreferences.setMockInitialValues({});
-                      SharedPreferences prefs =
-                          await SharedPreferences.getInstance();
-                      prefs.setString('access_token',
-                          responseParsed["response_body"]["access_token"]);
                       prefs.setString('refresh_token',
                           responseParsed["response_body"]["refresh_token"]);
                     }
@@ -129,14 +129,6 @@ class _BodyState extends State<Body> {
                       context,
                       MaterialPageRoute(builder: (context) => MainScreen()),
                     );
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      content: Text('Email di verifica inviata!'),
-                      behavior: SnackBarBehavior.floating,
-                      /*action: SnackBarAction(
-                        label: 'Undo',
-                        onPressed: () {},
-                      ),*/
-                    ));
                   }
                 }
               },

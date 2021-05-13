@@ -145,7 +145,7 @@ class _BodyState extends State<Body> {
                   return;
                 }
                 requestStarted = true;
-                (context as Element).markNeedsBuild();
+                setState(() {});
                 var url = Uri.parse(
                     'https://sechisimone.altervista.org/flows/API/registration/signup.php');
                 var response = await http.post(url, body: {

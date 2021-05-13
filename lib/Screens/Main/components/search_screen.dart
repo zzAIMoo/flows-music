@@ -71,7 +71,7 @@ class _SearchScreenState extends State<SearchScreen> {
         _getMoreData();
       }
     });
-    callAPI("funny video");
+    callAPI("test");
   }
 
   @override
