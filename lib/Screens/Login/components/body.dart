@@ -24,8 +24,46 @@ class Body extends StatefulWidget {
 
 class _BodyState extends State<Body> {
   bool isHidden = true, wantsToSavePassword = false, requestStarted = false;
+  String email = "", psw = "", refreshToken = "";
 
-  String email = "", psw = "";
+  Future<Null> getSharedPrefs() async {
+    SharedPreferences.getInstance().then((SharedPreferences prefs) async {
+      if (prefs.containsKey("refresh_token")) {
+        refreshToken = prefs.getString("refresh_token");
+        requestStarted = true;
+        var url = Uri.parse(
+            'https://sechisimone.altervista.org/flows/API/registration/signin.php');
+        var response =
+            await http.post(url, body: {'refresh_token': refreshToken});
+        print('Response status: ${response.statusCode}');
+        print('Response body: ${response.body}');
+        if (response.statusCode == 200) {
+          var responseParsed = convert.jsonDecode(response.body);
+          if (responseParsed["response_type"] == "loggedin_correctly") {
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            prefs.setString('access_token',
+                responseParsed["response_body"]["access_token"]);
+            if (wantsToSavePassword) {
+              prefs.setString('refresh_token',
+                  responseParsed["response_body"]["refresh_token"]);
+            }
+            requestStarted = false;
+            (context as Element).markNeedsBuild();
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => MainScreen()),
+            );
+          }
+        }
+      }
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getSharedPrefs();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -96,9 +134,7 @@ class _BodyState extends State<Body> {
                 print('Response status: ${response.statusCode}');
                 print('Response body: ${response.body}');
                 if (response.statusCode == 200) {
-                  print(response.body);
                   var responseParsed = convert.jsonDecode(response.body);
-                  print(responseParsed["response_type"]);
                   if (responseParsed["response_type"] == "already_registered") {
                     showToast(
                         "Mail/Username già utilizzati in un altro account");
@@ -113,13 +149,14 @@ class _BodyState extends State<Body> {
                     return;
                   } else if (responseParsed["response_type"] ==
                       "loggedin_correctly") {
-                    // ignore: invalid_use_of_visible_for_testing_member
-                    SharedPreferences.setMockInitialValues({});
                     SharedPreferences prefs =
                         await SharedPreferences.getInstance();
                     prefs.setString('access_token',
                         responseParsed["response_body"]["access_token"]);
                     if (wantsToSavePassword) {
+                      if (prefs.containsKey("refresh_token")) {
+                        prefs.remove("refresh_token");
+                      }
                       prefs.setString('refresh_token',
                           responseParsed["response_body"]["refresh_token"]);
                     }
