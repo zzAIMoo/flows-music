@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:finto_spoti/Screens/Login/login_screen.dart';
 import 'package:finto_spoti/Screens/Signup/components/background.dart';
@@ -9,8 +7,6 @@ import 'package:finto_spoti/components/already_have_an_account_acheck.dart';
 import 'package:finto_spoti/components/rounded_button.dart';
 import 'package:finto_spoti/components/rounded_input_field.dart';
 import 'package:finto_spoti/components/rounded_password_field.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:crypto/crypto.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
@@ -27,7 +23,6 @@ class _BodyState extends State<Body> {
   bool isHidden_1 = true,
       isHidden_2 = true,
       emailValid = true,
-      wantsToSavePassword = false,
       requestStarted = false;
 
   bool isUsernameValid = true,
@@ -131,22 +126,6 @@ class _BodyState extends State<Body> {
                 (context as Element).markNeedsBuild();
               },
             ),*/
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text("Salva Credenziali"),
-                Checkbox(
-                  fillColor: MaterialStateColor.resolveWith(
-                      (states) => Color(0xFF6F35A5)),
-                  checkColor: Colors.white,
-                  value: wantsToSavePassword,
-                  onChanged: (newValue) {
-                    wantsToSavePassword = newValue;
-                    (context as Element).markNeedsBuild();
-                  },
-                ),
-              ],
-            ),
             RoundedButton(
               text: "SIGNUP",
               textColor: Colors.white,
@@ -192,7 +171,7 @@ class _BodyState extends State<Body> {
                 requestStarted = true;
                 (context as Element).markNeedsBuild();
                 var url = Uri.parse(
-                    'http://192.168.178.86/Flows_Progetto_Esame/API/registration/signup.php');
+                    'https://sechisimone.altervista.org/flows/API/registration/signup.php');
                 var response = await http.post(url, body: {
                   'email': email,
                   'username': username,
@@ -216,15 +195,6 @@ class _BodyState extends State<Body> {
                     (context as Element).markNeedsBuild();
                     return;
                   } else if (responseParsed["response_type"] == "email_sent") {
-                    if (wantsToSavePassword) {
-                      // ignore: invalid_use_of_visible_for_testing_member
-                      SharedPreferences.setMockInitialValues({});
-                      SharedPreferences prefs =
-                          await SharedPreferences.getInstance();
-                      prefs.setString('email', email);
-                      prefs.setString('pass',
-                          sha256.convert(utf8.encode(psw_1)).toString());
-                    }
                     requestStarted = false;
                     (context as Element).markNeedsBuild();
                     Navigator.pushReplacement(

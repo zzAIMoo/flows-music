@@ -7,7 +7,7 @@ void main() {
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MainScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -15,20 +15,20 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.purple,
       ),
-      home: MyHomePage(title: 'Home'),
+      home: MainScreenPage(title: 'Home'),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+class MainScreenPage extends StatefulWidget {
+  MainScreenPage({Key key, this.title}) : super(key: key);
   final String title;
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _MainScreenPageState createState() => _MainScreenPageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MainScreenPageState extends State<MainScreenPage> {
   bool swipeLeft = false, swipeRight = false, still = true;
   List<Widget> funzioneCarina(BuildContext context) {
     // ignore: unused_local_variable
