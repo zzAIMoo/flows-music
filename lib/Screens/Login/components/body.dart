@@ -23,15 +23,9 @@ class Body extends StatefulWidget {
 }
 
 class _BodyState extends State<Body> {
-  bool isHidden = true,
-      wantsToSavePassword = false,
-      isEmailValid = true,
-      emailValid = true,
-      isHidden_1 = false,
-      isPassword1Valid = true,
-      requestStarted = false;
+  bool isHidden = true, wantsToSavePassword = false, requestStarted = false;
 
-  String email = "", psw_1 = "";
+  String email = "", psw = "";
 
   @override
   Widget build(BuildContext context) {
@@ -54,39 +48,22 @@ class _BodyState extends State<Body> {
             RoundedInputField(
               icon: Icons.email_rounded,
               inputType: TextInputType.emailAddress,
-              border: isEmailValid
-                  ? InputBorder.none
-                  : OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.red, width: 50.0),
-                      borderRadius: BorderRadius.circular(25.0),
-                    ),
+              border: InputBorder.none,
               color: Color(0xFF6F35A5),
               hintText: "Your Email",
               onChanged: (value) {
-                emailValid = RegExp(
-                        r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                    .hasMatch(value);
                 email = value;
               },
             ),
             RoundedPasswordField(
-              hidden: isHidden_1,
-              border: isPassword1Valid
-                  ? InputBorder.none
-                  : OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.red, width: 50.0),
-                      borderRadius: BorderRadius.circular(25.0),
-                    ),
+              hidden: isHidden,
+              border: InputBorder.none,
               onChanged: (value) {
-                psw_1 = value;
-                if (psw_1.length < 8) {
-                  isPassword1Valid = false;
-                  return;
-                }
+                psw = value;
               },
               press: () {
-                isHidden_1 = !isHidden_1;
-                (context as Element).markNeedsBuild();
+                isHidden = !isHidden;
+                setState(() {});
               },
             ),
             Row(
@@ -100,39 +77,39 @@ class _BodyState extends State<Body> {
                   value: wantsToSavePassword,
                   onChanged: (newValue) {
                     wantsToSavePassword = newValue;
-                    (context as Element).markNeedsBuild();
+                    setState(() {});
                   },
                 ),
               ],
             ),
             RoundedButton(
-              textColor: Colors.white,
               text: "LOGIN",
+              textColor: Colors.white,
               isLoading: requestStarted,
               press: () async {
                 requestStarted = true;
-                (context as Element).markNeedsBuild();
+                setState(() {});
                 var url = Uri.parse(
                     'https://sechisimone.altervista.org/flows/API/registration/signin.php');
                 var response = await http
-                    .post(url, body: {'email': email, 'password': psw_1});
+                    .post(url, body: {'email': email, 'password': psw});
                 print('Response status: ${response.statusCode}');
                 print('Response body: ${response.body}');
                 if (response.statusCode == 200) {
+                  print(response.body);
                   var responseParsed = convert.jsonDecode(response.body);
                   print(responseParsed["response_type"]);
                   if (responseParsed["response_type"] == "already_registered") {
-                    //questi sono qua nel caso in futuro aggiungessi degli errori da php (cosa molto molto probabile), per ora non servono a nulla
                     showToast(
                         "Mail/Username già utilizzati in un altro account");
                     requestStarted = false;
-                    (context as Element).markNeedsBuild();
+                    setState(() {});
                     return;
                   } else if (responseParsed["response_type"] == "email_error") {
                     showToast(
                         "Ci sono problemi con i server, si è pregati di riprovare più tardi");
                     requestStarted = false;
-                    (context as Element).markNeedsBuild();
+                    setState(() {});
                     return;
                   } else if (responseParsed["response_type"] ==
                       "loggedin_correctly") {
