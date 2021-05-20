@@ -82,8 +82,8 @@ class _CardScreenState extends State<CardScreen> {
                                   begin: FractionalOffset.topLeft,
                                   end: FractionalOffset.bottomRight,
                                   colors: <Color>[
-                                    Colors.red[800],
-                                    Colors.red,
+                                    Colors.purple,
+                                    Colors.redAccent,
                                     Colors.white,
                                   ],
                                   tileMode: TileMode.clamp,
@@ -113,12 +113,12 @@ class _CardScreenState extends State<CardScreen> {
                           : ShaderMask(
                               shaderCallback: (Rect bounds) {
                                 return LinearGradient(
-                                  stops: [0.0, gradValue / 2, gradValue],
+                                  stops: [0.0, gradValue / 1.2, gradValue],
                                   begin: FractionalOffset.topRight,
                                   end: FractionalOffset.bottomLeft,
                                   colors: <Color>[
-                                    Colors.green[800],
-                                    Colors.green,
+                                    Colors.purple,
+                                    Colors.pinkAccent,
                                     Colors.white,
                                   ],
                                   tileMode: TileMode.clamp,
