@@ -15,13 +15,14 @@ class _SearchScreenState extends State<SearchScreen> {
   SearchBar searchBar;
   static String key = "AIzaSyBgARzrg0k-ro-BbdTxYfWuwvNtIC6osXA";
 
-  YoutubeAPI ytApi = YoutubeAPI(key);
+  YoutubeAPI ytApi = YoutubeAPI(key, maxResults: 50);
   List<YT_API> ytResult = [];
 
   callAPI(String text) async {
     ytResult = await ytApi.search(text);
-    results.addAll(ytResult);
-    setState(() {});
+    setState(() {
+      results.addAll(ytResult);
+    });
   }
 
   AppBar buildAppBar(BuildContext context) {
@@ -48,8 +49,9 @@ class _SearchScreenState extends State<SearchScreen> {
 
   void onSubmitted(String value) {
     results = [];
-    callAPI(value);
-    setState(() {});
+    setState(() {
+      callAPI(value);
+    });
   }
 
   @override
@@ -57,11 +59,10 @@ class _SearchScreenState extends State<SearchScreen> {
     super.initState();
     _scrollController.addListener(() {
       if (_scrollController.position.pixels >=
-          _scrollController.position.maxScrollExtent - 50) {
+          _scrollController.position.maxScrollExtent - 80) {
         _getMoreData();
       }
     });
-    callAPI("test");
   }
 
   @override
@@ -72,11 +73,15 @@ class _SearchScreenState extends State<SearchScreen> {
 
   _getMoreData() async {
     if (!isPerformingRequest) {
-      setState(() => isPerformingRequest = true);
-      List<YT_API> newEntries = await nextPageRequest();
       setState(() {
-        results.addAll(newEntries);
-        isPerformingRequest = false;
+        isPerformingRequest = true;
+      });
+      List<YT_API> newEntries = await ytApi.nextPage();
+      setState(() {
+        setState(() {
+          results.addAll(newEntries);
+          isPerformingRequest = false;
+        });
       });
     }
   }
@@ -107,10 +112,10 @@ class _SearchScreenState extends State<SearchScreen> {
             ),
             Padding(padding: EdgeInsets.only(right: 20.0)),
             Expanded(
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
                   Text(
                     results[index].title,
                     softWrap: true,
@@ -128,16 +133,12 @@ class _SearchScreenState extends State<SearchScreen> {
                 softWrap: true,
               ),
               */
-                ]))
+                ],
+              ),
+            )
           ],
         ),
       ),
     );
-  }
-
-  Future<List<YT_API>> nextPageRequest() async {
-    List<YT_API> ytResult = await ytApi.nextPage();
-    //int to = ytResult.length, from = 0;
-    return ytResult;
   }
 }
