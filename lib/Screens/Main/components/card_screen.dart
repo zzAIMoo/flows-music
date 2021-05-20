@@ -47,7 +47,7 @@ class _CardScreenState extends State<CardScreen> {
                   orientation: AmassOrientation.BOTTOM,
                   totalNum: songImages.length,
                   stackNum: 3,
-                  swipeEdge: 3.0,
+                  swipeEdge: 2.5,
                   maxWidth: MediaQuery.of(context).size.width * 0.9,
                   maxHeight: MediaQuery.of(context).size.width * 0.9,
                   minWidth: MediaQuery.of(context).size.width * 0.8,
@@ -78,11 +78,12 @@ class _CardScreenState extends State<CardScreen> {
                           ? ShaderMask(
                               shaderCallback: (Rect bounds) {
                                 return LinearGradient(
-                                  stops: [0.0, gradValue],
-                                  begin: FractionalOffset.centerRight,
-                                  end: FractionalOffset.topLeft,
+                                  stops: [0.0, gradValue / 2, gradValue],
+                                  begin: FractionalOffset.topLeft,
+                                  end: FractionalOffset.bottomRight,
                                   colors: <Color>[
-                                    Colors.redAccent,
+                                    Colors.red[800],
+                                    Colors.red,
                                     Colors.white,
                                   ],
                                   tileMode: TileMode.clamp,
@@ -112,10 +113,11 @@ class _CardScreenState extends State<CardScreen> {
                           : ShaderMask(
                               shaderCallback: (Rect bounds) {
                                 return LinearGradient(
-                                  stops: [0.0, gradValue],
-                                  begin: FractionalOffset.centerLeft,
-                                  end: FractionalOffset.topRight,
+                                  stops: [0.0, gradValue / 2, gradValue],
+                                  begin: FractionalOffset.topRight,
+                                  end: FractionalOffset.bottomLeft,
                                   colors: <Color>[
+                                    Colors.green[800],
                                     Colors.green,
                                     Colors.white,
                                   ],
@@ -147,22 +149,22 @@ class _CardScreenState extends State<CardScreen> {
                   swipeUpdateCallback:
                       (DragUpdateDetails details, Alignment align) {
                     /// Get swiping card's alignment
-                    gradValue = (align.x / 10).abs() + 0.3;
-                    if (align.x < -3) {
+                    gradValue = (align.x / 10).abs() + 0.15;
+                    if (align.x < -1) {
                       setState(() {
                         still = false;
                         swipeLeft = true;
                         swipeRight = false;
                       });
                       //Card is LEFT swiping
-                    } else if (align.x > 3) {
+                    } else if (align.x > 1) {
                       setState(() {
                         still = false;
                         swipeLeft = false;
                         swipeRight = true;
                       });
                       //Card is RIGHT swiping
-                    } else if (align.x > -3 && align.x < 3) {
+                    } else if (align.x > -1 && align.x < 1) {
                       setState(() {
                         still = true;
                         swipeLeft = false;
@@ -179,9 +181,6 @@ class _CardScreenState extends State<CardScreen> {
                     still = true;
                     swipeLeft = false;
                     swipeRight = false;
-                    print(orientation);
-                    print(index);
-                    print(currIndex);
                   },
                 ),
               ),
