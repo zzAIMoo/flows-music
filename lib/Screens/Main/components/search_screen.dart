@@ -2,23 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:youtube_api/youtube_api.dart';
 import 'package:flutter_search_bar/flutter_search_bar.dart';
 
-void main() => runApp(MyApp());
-
 List<YT_API> results = [];
 
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(
-        brightness: Brightness.dark,
-      ),
-      themeMode: ThemeMode.dark,
-      debugShowCheckedModeBanner: false,
-      home: SearchScreen(),
-    );
-  }
-}
+
 
 class SearchScreen extends StatefulWidget {
   @override
@@ -42,8 +28,14 @@ class _SearchScreenState extends State<SearchScreen> {
 
   AppBar buildAppBar(BuildContext context) {
     return new AppBar(
-      title: new Text('Search API YT'),
+      title: new Text('Cerca un media'),
       actions: [searchBar.getSearchAction(context)],
+      textTheme: TextTheme(
+        headline6: TextStyle( 
+          color: Colors.white,
+          fontSize:  18,
+        ),
+      ),
     );
   }
 

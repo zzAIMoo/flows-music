@@ -10,7 +10,6 @@ import 'dart:convert' as convert;
 //import 'package:image/image.dart' as IMG;
 
 void main() {
-  runApp(MyApp());
 }
 
 class MainScreen extends StatelessWidget {
@@ -231,7 +230,7 @@ class _MainScreenPageState extends State<MainScreenPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      appBar: _selectedIndex==1?null:AppBar(
         title: const Text('Flows'),
       ),
       body: Center(
