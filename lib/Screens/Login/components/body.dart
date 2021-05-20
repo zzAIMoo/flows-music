@@ -62,7 +62,7 @@ class _BodyState extends State<Body> {
   @override
   void initState() {
     super.initState();
-    getSharedPrefs();
+    //getSharedPrefs();
   }
 
   @override
@@ -107,7 +107,7 @@ class _BodyState extends State<Body> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text("Salva Credenziali"),
+                Text("Keep me logged in!"),
                 Checkbox(
                   fillColor: MaterialStateColor.resolveWith(
                       (states) => Color(0xFF6F35A5)),

@@ -4,8 +4,6 @@ import 'package:flutter_search_bar/flutter_search_bar.dart';
 
 List<YT_API> results = [];
 
-
-
 class SearchScreen extends StatefulWidget {
   @override
   _SearchScreenState createState() => _SearchScreenState();
@@ -31,9 +29,9 @@ class _SearchScreenState extends State<SearchScreen> {
       title: new Text('Cerca un media'),
       actions: [searchBar.getSearchAction(context)],
       textTheme: TextTheme(
-        headline6: TextStyle( 
+        headline6: TextStyle(
           color: Colors.white,
-          fontSize:  18,
+          fontSize: 18,
         ),
       ),
     );

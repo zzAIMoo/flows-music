@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_tindercard/flutter_tindercard.dart';
 import 'components/search_screen.dart';
+import 'components/card_screen.dart';
 import 'package:finto_spoti/components/rounded_button.dart';
 import 'dart:math';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -9,8 +9,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 //import 'package:image/image.dart' as IMG;
 
-void main() {
-}
+void main() {}
 
 class MainScreen extends StatelessWidget {
   @override
@@ -39,10 +38,7 @@ class _MainScreenPageState extends State<MainScreenPage> {
     accessToken = prefs.getString("access_token");
   }
 
-  bool swipeLeft = false,
-      swipeRight = false,
-      still = true,
-      requestStarted = false;
+  bool requestStarted = false;
   String accessToken = "";
   @override
   void initState() {
@@ -51,93 +47,10 @@ class _MainScreenPageState extends State<MainScreenPage> {
     getSharedPrefs();
   }
 
-  List<Widget> funzioneCarina(BuildContext context) {
+  List<Widget> buildPage(BuildContext context) {
     // ignore: unused_local_variable
-    CardController controller;
     return <Widget>[
-      Column(
-        children: [
-          Container(
-            height: MediaQuery.of(context).size.height * 0.6,
-            child: new TinderSwapCard(
-              swipeUp: false,
-              swipeDown: false,
-              orientation: AmassOrientation.BOTTOM,
-              totalNum: songImages.length,
-              stackNum: 3,
-              swipeEdge: 3.0,
-              maxWidth: MediaQuery.of(context).size.width * 0.9,
-              maxHeight: MediaQuery.of(context).size.width * 0.9,
-              minWidth: MediaQuery.of(context).size.width * 0.8,
-              minHeight: MediaQuery.of(context).size.width * 0.8,
-              /*cardBuilder: (context, index) => Card(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(80.0),
-                  child: Image.network('${songImages[index]}',
-                      width: 150.0, height: 100.0),
-                ),
-                elevation: 20,
-              ),*/
-              cardBuilder: (context, index) => Card(
-                  child: new Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  new Container(
-                      width: 250.0,
-                      height: 250.0,
-                      decoration: new BoxDecoration(
-                          shape: BoxShape.circle,
-                          image: new DecorationImage(
-                              fit: BoxFit.fill,
-                              image:
-                                  new NetworkImage('${songImages[index]}')))),
-                ],
-              )),
-              cardController: controller = CardController(),
-              swipeUpdateCallback:
-                  (DragUpdateDetails details, Alignment align) {
-                /// Get swiping card's alignment
-                if (align.x < -3) {
-                  setState(() {
-                    still = false;
-                    swipeLeft = true;
-                    swipeRight = false;
-                  });
-                  //Card is LEFT swiping
-                } else if (align.x > 3) {
-                  setState(() {
-                    still = false;
-                    swipeLeft = false;
-                    swipeRight = true;
-                  });
-                  //Card is RIGHT swiping
-                } else if (align.x > -3 && align.x < 3) {
-                  setState(() {
-                    still = true;
-                    swipeLeft = false;
-                    swipeRight = false;
-                  });
-                }
-              },
-              swipeCompleteCallback:
-                  (CardSwipeOrientation orientation, int index) {
-                still = true;
-                swipeLeft = false;
-                swipeRight = false;
-                print(orientation);
-              },
-            ),
-          ),
-          still
-              ? Container()
-              : swipeRight
-                  ? Icon(Icons.check)
-                  : swipeLeft
-                      ? Icon(Icons.close)
-                      : Container(),
-        ],
-      ),
+      CardScreen(),
       SearchScreen(),
       Column(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -205,16 +118,6 @@ class _MainScreenPageState extends State<MainScreenPage> {
         fontSize: 24.0);
   }
 
-  List<String> songImages = [
-    "https://cdns.iconmonstr.com/wp-content/assets/preview/2012/240/iconmonstr-sound-wave-4.png",
-    "https://images.unsplash.com/photo-1612979857678-0ce10e5b3439?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=1350&q=80",
-    "https://images.unsplash.com/photo-1613066839141-4489f60e0389?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=634&q=80",
-    "https://images.unsplash.com/photo-1613066839141-4489f60e0389?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=634&q=80",
-    "https://images.unsplash.com/photo-1613098169745-015562f6f27a?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=634&q=80",
-    "https://images.unsplash.com/photo-1612979857678-0ce10e5b3439?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=1350&q=80",
-    "https://images.unsplash.com/photo-1613066839141-4489f60e0389?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=634&q=80",
-    "https://images.unsplash.com/photo-1613066839141-4489f60e0389?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=634&q=80"
-  ];
   int _selectedIndex = 0;
   void _onItemTapped(int index) {
     setState(() {
@@ -230,11 +133,13 @@ class _MainScreenPageState extends State<MainScreenPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _selectedIndex==1?null:AppBar(
-        title: const Text('Flows'),
-      ),
+      appBar: _selectedIndex == 1
+          ? null
+          : AppBar(
+              title: const Text('Flows'),
+            ),
       body: Center(
-        child: funzioneCarina(context).elementAt(_selectedIndex),
+        child: buildPage(context).elementAt(_selectedIndex),
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
