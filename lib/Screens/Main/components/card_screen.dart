@@ -30,10 +30,13 @@ class _CardScreenState extends State<CardScreen> {
     "https://images.unsplash.com/photo-1613066839141-4489f60e0389?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=634&q=80"
   ];
 
+  String url =
+      'https://sechisimone.altervista.org/flows/songs/RADICAL__MINACCIA.mp3';
+
   @override
   void initState() {
     super.initState();
-    _cardManager = new CardManager();
+    _cardManager = new CardManager(url);
   }
 
   @override
@@ -87,6 +90,7 @@ class _CardScreenState extends State<CardScreen> {
                                       _cardManager.progressNotifier,
                                   builder: (_, value, __) {
                                     return ProgressBar(
+                                      onSeek: _cardManager.seek,
                                       progress: value.current,
                                       buffered: value.buffered,
                                       total: value.total,
@@ -145,9 +149,9 @@ class _CardScreenState extends State<CardScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: <Widget>[
-                                    new Container(
-                                      width: 250.0,
-                                      height: 250.0,
+                                    Container(
+                                      width: 150.0,
+                                      height: 150.0,
                                       decoration: new BoxDecoration(
                                         shape: BoxShape.circle,
                                         image: new DecorationImage(
@@ -156,11 +160,56 @@ class _CardScreenState extends State<CardScreen> {
                                               '${songImages[index]}'),
                                         ),
                                       ),
-                                    )
+                                    ),
+                                    SizedBox(
+                                      width: 300,
+                                      child: ValueListenableBuilder<
+                                          ProgressBarState>(
+                                        valueListenable:
+                                            _cardManager.progressNotifier,
+                                        builder: (_, value, __) {
+                                          return ProgressBar(
+                                            onSeek: _cardManager.seek,
+                                            progress: value.current,
+                                            buffered: value.buffered,
+                                            total: value.total,
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                    ValueListenableBuilder<ButtonState>(
+                                      valueListenable:
+                                          _cardManager.buttonNotifier,
+                                      builder: (_, value, __) {
+                                        switch (value) {
+                                          case ButtonState.loading:
+                                            return Container(
+                                              margin: EdgeInsets.all(8.0),
+                                              width: 32.0,
+                                              height: 32.0,
+                                              child:
+                                                  CircularProgressIndicator(),
+                                            );
+                                          case ButtonState.paused:
+                                            return IconButton(
+                                              icon: Icon(Icons.play_arrow),
+                                              iconSize: 32.0,
+                                              onPressed: _cardManager.play,
+                                            );
+                                          case ButtonState.playing:
+                                            return IconButton(
+                                              icon: Icon(Icons.pause),
+                                              iconSize: 32.0,
+                                              onPressed: _cardManager.pause,
+                                            );
+                                          default:
+                                            return Container();
+                                        }
+                                      },
+                                    ),
                                   ],
                                 ),
-                              ),
-                            )
+                              ))
                           : ShaderMask(
                               shaderCallback: (Rect bounds) {
                                 return LinearGradient(
@@ -180,9 +229,9 @@ class _CardScreenState extends State<CardScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: <Widget>[
-                                    new Container(
-                                      width: 250.0,
-                                      height: 250.0,
+                                    Container(
+                                      width: 150.0,
+                                      height: 150.0,
                                       decoration: new BoxDecoration(
                                         shape: BoxShape.circle,
                                         image: new DecorationImage(
@@ -191,7 +240,53 @@ class _CardScreenState extends State<CardScreen> {
                                               '${songImages[index]}'),
                                         ),
                                       ),
-                                    )
+                                    ),
+                                    SizedBox(
+                                      width: 300,
+                                      child: ValueListenableBuilder<
+                                          ProgressBarState>(
+                                        valueListenable:
+                                            _cardManager.progressNotifier,
+                                        builder: (_, value, __) {
+                                          return ProgressBar(
+                                            onSeek: _cardManager.seek,
+                                            progress: value.current,
+                                            buffered: value.buffered,
+                                            total: value.total,
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                    ValueListenableBuilder<ButtonState>(
+                                      valueListenable:
+                                          _cardManager.buttonNotifier,
+                                      builder: (_, value, __) {
+                                        switch (value) {
+                                          case ButtonState.loading:
+                                            return Container(
+                                              margin: EdgeInsets.all(8.0),
+                                              width: 32.0,
+                                              height: 32.0,
+                                              child:
+                                                  CircularProgressIndicator(),
+                                            );
+                                          case ButtonState.paused:
+                                            return IconButton(
+                                              icon: Icon(Icons.play_arrow),
+                                              iconSize: 32.0,
+                                              onPressed: _cardManager.play,
+                                            );
+                                          case ButtonState.playing:
+                                            return IconButton(
+                                              icon: Icon(Icons.pause),
+                                              iconSize: 32.0,
+                                              onPressed: _cardManager.pause,
+                                            );
+                                          default:
+                                            return Container();
+                                        }
+                                      },
+                                    ),
                                   ],
                                 ),
                               ),

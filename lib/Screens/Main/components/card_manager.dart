@@ -1,21 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 
-const url =
-    'https://sechisimone.altervista.org/flows/songs/RADICAL__MINACCIA.mp3';
-
 class CardManager {
   void dispose() {
     _audioPlayer.dispose();
   }
 
-  CardManager() {
-    _init();
+  CardManager(String url) {
+    _init(url);
   }
 
   AudioPlayer _audioPlayer;
 
-  void _init() async {
+  void _init(String url) async {
     _audioPlayer = new AudioPlayer();
     await _audioPlayer.setUrl(url);
     _audioPlayer.playerStateStream.listen((playerState) {
@@ -26,8 +23,12 @@ class CardManager {
         buttonNotifier.value = ButtonState.loading;
       } else if (!isPlaying) {
         buttonNotifier.value = ButtonState.paused;
-      } else {
+      } else if (processingState != ProcessingState.completed) {
         buttonNotifier.value = ButtonState.playing;
+      } else {
+        // completed
+        _audioPlayer.seek(Duration.zero);
+        _audioPlayer.pause();
       }
     });
     _audioPlayer.positionStream.listen((position) {
@@ -62,6 +63,10 @@ class CardManager {
 
   void pause() {
     _audioPlayer.pause();
+  }
+
+  void seek(Duration position) {
+    _audioPlayer.seek(position);
   }
 
   final progressNotifier = ValueNotifier<ProgressBarState>(

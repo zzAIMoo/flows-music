@@ -41,13 +41,6 @@ class _BodyState extends State<Body> {
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             SizedBox(height: size.height * 0.03),
-            /*SvgPicture.asset(
-              "assets/icons/signup.svg",
-              height: size.height * 0.35,
-            ),*/
-
-            //TODO: https://api.flutter.dev/flutter/material/TextFormField-class.html
-
             RoundedInputField(
               inputType: TextInputType.text,
               border: isUsernameValid
@@ -110,38 +103,17 @@ class _BodyState extends State<Body> {
                 if (username.contains(" ")) {
                   showToast("Lo username non può contenere spazi");
                   isUsernameValid = false;
-                } else if (psw.length < 8 /*|| psw_2.length < 8*/) {
+                } else if (psw.length < 8) {
                   showToast("La password deve essere lunga almeno 8 caratteri");
                   isPasswordValid = false;
-
-                  /*if (psw_2.length < 8) isPassword2Valid = false;
-                  (context as Element).markNeedsBuild();
-                  return;*/
                 }
-                if (username == "" ||
-                        email == "" ||
-                        psw == "" /*||
-                    psw_2 == ""*/
-                    ) {
+                if (username == "" || email == "" || psw == "") {
                   showToast("Uno dei campi è vuoto");
                   return;
-                }
-                //probabilmente non lo userò più
-                /*if (psw_1 != psw_2) {
-                  Fluttertoast.showToast(
-                      msg: "Le password non coincidono",
-                      toastLength: Toast.LENGTH_SHORT,
-                      gravity: ToastGravity.CENTER,
-                      timeInSecForIosWeb: 2,
-                      backgroundColor: Colors.red,
-                      textColor: Colors.white,
-                      fontSize: 24.0);
-                  return;
-                }*/
-                else if (!isEmailValid) {
+                } else if (!isEmailValid) {
                   isEmailValid = false;
                   showToast("Formato email non valido");
-                  (context as Element).markNeedsBuild();
+                  setState(() {});
                   return;
                 }
                 requestStarted = true;
@@ -162,17 +134,17 @@ class _BodyState extends State<Body> {
                     showToast(
                         "Mail/Username già utilizzati in un altro account");
                     requestStarted = false;
-                    (context as Element).markNeedsBuild();
+                    setState(() {});
                     return;
                   } else if (responseParsed["response_type"] == "email_error") {
                     showToast(
                         "Ci sono problemi con i server, si è pregati di riprovare più tardi");
                     requestStarted = false;
-                    (context as Element).markNeedsBuild();
+                    setState(() {});
                     return;
                   } else if (responseParsed["response_type"] == "email_sent") {
                     requestStarted = false;
-                    (context as Element).markNeedsBuild();
+                    setState(() {});
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(builder: (context) => LoginScreen()),
@@ -180,10 +152,6 @@ class _BodyState extends State<Body> {
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                       content: Text('Email di verifica inviata!'),
                       behavior: SnackBarBehavior.floating,
-                      /*action: SnackBarAction(
-                        label: 'Undo',
-                        onPressed: () {},
-                      ),*/
                     ));
                   }
                 }

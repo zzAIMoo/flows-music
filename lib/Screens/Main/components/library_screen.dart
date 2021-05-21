@@ -1,3 +1,4 @@
+import 'package:flows/Screens/Login/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flows/components/rounded_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -15,10 +16,11 @@ class _LibraryScreenState extends State<LibraryScreen> {
   Future<Null> getSharedPrefs() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     accessToken = prefs.getString("access_token");
+    refreshToken = prefs.getString("refresh_token");
   }
 
   bool requestStarted = false;
-  String accessToken = "";
+  String accessToken = "", refreshToken = "";
 
   @override
   void initState() {
@@ -41,41 +43,75 @@ class _LibraryScreenState extends State<LibraryScreen> {
           text: "CREATE FAKE PLAYLIST",
           textColor: Colors.white,
           isLoading: requestStarted,
-          press: () async {
-            requestStarted = true;
-            setState(() {});
-            String randomName = generateRandomString(5);
-            var url = Uri.parse(
-                'https://sechisimone.altervista.org/flows/API/create/add_playlist.php');
-            print(randomName);
-            print(accessToken);
-            var response = await http.post(url, body: {
-              'name': randomName,
-              'description': "descrizione",
-              'access_token': accessToken,
-            });
-            print('Response status: ${response.statusCode}');
-            print('Response body: ${response.body}');
-            if (response.statusCode == 200) {
-              var responseParsed = convert.jsonDecode(response.body);
-              print(responseParsed["response_type"]);
-              if (responseParsed["response_type"] == "playlist_added") {
-                showToast(
-                    "Playlist creata correttamente con il nome " + randomName);
-                requestStarted = false;
-                (context as Element).markNeedsBuild();
-                return;
-              } else if (responseParsed["response_type"] == "error_in_adding") {
-                showToast("C'è stato un errore nella creazione della playlist");
-                requestStarted = false;
-                (context as Element).markNeedsBuild();
-                return;
-              }
-            }
+          press: () {
+            createPlaylist(generateRandomString(5));
           },
         ),
       ],
     );
+  }
+
+  createPlaylist(playlistName) async {
+    requestStarted = true;
+    setState(() {});
+    var url = Uri.parse(
+        'https://sechisimone.altervista.org/flows/API/create/add_playlist.php');
+    var response = await http.post(url, body: {
+      'name': playlistName,
+      'description': "descrizione",
+      'access_token': accessToken,
+    });
+    print('Response status: ${response.statusCode}');
+    print('Response body: ${response.body}');
+    if (response.statusCode == 200) {
+      var responseParsed = convert.jsonDecode(response.body);
+      if (responseParsed["response_type"] == "playlist_added") {
+        showToast("Playlist creata correttamente con il nome " + playlistName);
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString('access_token',
+            responseParsed["response_body"]["access_token"].toString());
+        requestStarted = false;
+        setState(() {});
+        return;
+      } else if (responseParsed["response_type"] == "error_in_adding") {
+        showToast("C'è stato un errore nella creazione della playlist");
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString('access_token',
+            responseParsed["response_body"]["access_token"].toString());
+        requestStarted = false;
+        setState(() {});
+        return;
+      } else if (responseParsed["response_type"] == "access_token_expired") {
+        var url = Uri.parse(
+            'https://sechisimone.altervista.org/flows/API/OAuth/get_access_token.php');
+        var response = await http.post(url, body: {
+          'refresh_token': refreshToken,
+        });
+        if (response.statusCode == 200) {
+          var responseParsed = convert.jsonDecode(response.body);
+          if (responseParsed["response_type"] ==
+              "access_token_created_correctly") {
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            prefs.setString('access_token',
+                responseParsed["response_body"]["access_token"]);
+            createPlaylist(playlistName);
+          } else if (responseParsed["response_type"] ==
+              "refresh_token_expired") {
+            showToast("Token Expired, logging out of the account");
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            prefs.clear();
+            requestStarted = false;
+            setState(() {});
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => LoginScreen(),
+              ),
+            );
+          }
+        }
+      }
+    }
   }
 
   String generateRandomString(int len) {

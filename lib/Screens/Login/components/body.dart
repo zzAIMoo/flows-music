@@ -48,7 +48,7 @@ class _BodyState extends State<Body> {
                   responseParsed["response_body"]["refresh_token"]);
             }
             requestStarted = false;
-            (context as Element).markNeedsBuild();
+            setState(() {});
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => MainScreen()),
@@ -161,7 +161,7 @@ class _BodyState extends State<Body> {
                           responseParsed["response_body"]["refresh_token"]);
                     }
                     requestStarted = false;
-                    (context as Element).markNeedsBuild();
+                    setState(() {});
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(builder: (context) => MainScreen()),
