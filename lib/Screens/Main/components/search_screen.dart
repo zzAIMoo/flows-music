@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_api/youtube_api.dart';
 import 'package:flutter_search_bar/flutter_search_bar.dart';
+import 'package:shimmer/shimmer.dart';
 
 List<YT_API> results = [];
 
@@ -11,19 +12,12 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   ScrollController _scrollController = new ScrollController();
-  bool isPerformingRequest = false;
+  bool isPerformingRequest = false, hasStartedSearch = false;
   SearchBar searchBar;
   static String key = "AIzaSyBgARzrg0k-ro-BbdTxYfWuwvNtIC6osXA";
 
   YoutubeAPI ytApi = YoutubeAPI(key, maxResults: 50);
   List<YT_API> ytResult = [];
-
-  callAPI(String text) async {
-    ytResult = await ytApi.search(text);
-    setState(() {
-      results.addAll(ytResult);
-    });
-  }
 
   AppBar buildAppBar(BuildContext context) {
     return new AppBar(
@@ -47,11 +41,25 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  void onSubmitted(String value) {
-    results = [];
+  callAPI(String text) async {
+    ytResult = await ytApi.search(text);
+    hasStartedSearch = false;
     setState(() {
-      callAPI(value);
+      results.addAll(ytResult);
     });
+  }
+
+  void onSubmitted(String value) async {
+    if (!isPerformingRequest) {
+      setState(() {
+        isPerformingRequest = true;
+      });
+      List<YT_API> newResults = await ytApi.search(value);
+      setState(() {
+        isPerformingRequest = false;
+        results = newResults;
+      });
+    }
   }
 
   @override
@@ -78,23 +86,59 @@ class _SearchScreenState extends State<SearchScreen> {
       });
       List<YT_API> newEntries = await ytApi.nextPage();
       setState(() {
-        setState(() {
-          results.addAll(newEntries);
-          isPerformingRequest = false;
-        });
+        isPerformingRequest = false;
+        results.addAll(newEntries);
       });
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    print("isPerformingRequest: " + isPerformingRequest.toString());
+    print("hasStartedSearch: " + hasStartedSearch.toString());
     return Scaffold(
       appBar: searchBar.build(context),
       body: Container(
         child: ListView.builder(
           itemCount: results.length,
-          itemBuilder: (_, int index) => listItem(index),
+          itemBuilder: !isPerformingRequest
+              ? (_, int index) => listItem(index)
+              : (_, int index) => shimmerItems(),
           controller: _scrollController,
+        ),
+      ),
+    );
+  }
+
+  Widget shimmerItems() {
+    return Card(
+      child: Container(
+        margin: EdgeInsets.symmetric(vertical: 7.0),
+        padding: EdgeInsets.all(12.0),
+        child: Shimmer.fromColors(
+          baseColor: Colors.grey,
+          highlightColor: Colors.white,
+          child: Row(
+            children: <Widget>[
+              ClipRRect(
+                borderRadius: BorderRadius.circular(20.0), //or 15.0
+                child: Container(
+                  height: 70.0,
+                  width: 70.0,
+                  color: Color(0xffFF0E58),
+                ),
+              ),
+              Padding(padding: EdgeInsets.only(right: 20.0)),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(20.0), //or 15.0
+                child: Container(
+                  height: 10.0,
+                  width: 80.0,
+                  color: Color(0xffFF0E58),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

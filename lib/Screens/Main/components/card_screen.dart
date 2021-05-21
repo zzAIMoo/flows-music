@@ -9,7 +9,10 @@ class CardScreen extends StatefulWidget {
 
 class _CardScreenState extends State<CardScreen> {
   int currIndex = 0;
-  bool swipeLeft = false, swipeRight = false, still = true;
+  bool swipeLeft = false,
+      swipeRight = false,
+      still = true,
+      requestStarted = false;
   double gradValue = 1.0;
   CardController controller;
 
@@ -42,12 +45,13 @@ class _CardScreenState extends State<CardScreen> {
               Container(
                 height: MediaQuery.of(context).size.height * 0.6,
                 child: new TinderSwapCard(
+                  animDuration: 200,
                   swipeUp: false,
                   swipeDown: false,
                   orientation: AmassOrientation.BOTTOM,
                   totalNum: songImages.length,
                   stackNum: 3,
-                  swipeEdge: 2.5,
+                  swipeEdge: 2.2,
                   maxWidth: MediaQuery.of(context).size.width * 0.9,
                   maxHeight: MediaQuery.of(context).size.width * 0.9,
                   minWidth: MediaQuery.of(context).size.width * 0.8,
@@ -82,8 +86,8 @@ class _CardScreenState extends State<CardScreen> {
                                   begin: FractionalOffset.topLeft,
                                   end: FractionalOffset.bottomRight,
                                   colors: <Color>[
-                                    Colors.purple,
-                                    Colors.redAccent,
+                                    Colors.red,
+                                    Colors.red[200],
                                     Colors.white,
                                   ],
                                   tileMode: TileMode.clamp,
@@ -113,12 +117,12 @@ class _CardScreenState extends State<CardScreen> {
                           : ShaderMask(
                               shaderCallback: (Rect bounds) {
                                 return LinearGradient(
-                                  stops: [0.0, gradValue / 1.2, gradValue],
+                                  stops: [0.0, gradValue / 2, gradValue],
                                   begin: FractionalOffset.topRight,
                                   end: FractionalOffset.bottomLeft,
                                   colors: <Color>[
                                     Colors.purple,
-                                    Colors.pinkAccent,
+                                    Colors.purple[200],
                                     Colors.white,
                                   ],
                                   tileMode: TileMode.clamp,
@@ -149,22 +153,22 @@ class _CardScreenState extends State<CardScreen> {
                   swipeUpdateCallback:
                       (DragUpdateDetails details, Alignment align) {
                     /// Get swiping card's alignment
-                    gradValue = (align.x / 10).abs() + 0.15;
-                    if (align.x < -1) {
+                    gradValue = (align.x / 10).abs();
+                    if (align.x < -1.5) {
                       setState(() {
                         still = false;
                         swipeLeft = true;
                         swipeRight = false;
                       });
                       //Card is LEFT swiping
-                    } else if (align.x > 1) {
+                    } else if (align.x > 1.5) {
                       setState(() {
                         still = false;
                         swipeLeft = false;
                         swipeRight = true;
                       });
                       //Card is RIGHT swiping
-                    } else if (align.x > -1 && align.x < 1) {
+                    } else if (align.x > -1.5 && align.x < 1.5) {
                       setState(() {
                         still = true;
                         swipeLeft = false;
@@ -174,13 +178,15 @@ class _CardScreenState extends State<CardScreen> {
                   },
                   swipeCompleteCallback:
                       (CardSwipeOrientation orientation, int index) {
-                    if (orientation == CardSwipeOrientation.RIGHT ||
-                        orientation == CardSwipeOrientation.LEFT) {
-                      currIndex++;
-                    }
-                    still = true;
-                    swipeLeft = false;
-                    swipeRight = false;
+                    setState(() {
+                      if (orientation == CardSwipeOrientation.RIGHT ||
+                          orientation == CardSwipeOrientation.LEFT) {
+                        currIndex++;
+                      }
+                      still = true;
+                      swipeLeft = false;
+                      swipeRight = false;
+                    });
                   },
                 ),
               ),
@@ -194,20 +200,21 @@ class _CardScreenState extends State<CardScreen> {
                 child: RoundedButton(
                   text: "LOAD OTHER SONGS",
                   textColor: Colors.white,
-                  isLoading: false,
+                  isLoading: requestStarted,
                   press: () async {
                     setState(() {
+                      requestStarted = true;
                       currIndex = 0;
                       songImages = [
                         "https://cdns.iconmonstr.com/wp-content/assets/preview/2012/240/iconmonstr-sound-wave-4.png",
-                        "https://images.unsplash.com/photo-1612979857678-0ce10e5b3439?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=1350&q=80",
-                        "https://images.unsplash.com/photo-1613066839141-4489f60e0389?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=634&q=80",
-                        "https://images.unsplash.com/photo-1613066839141-4489f60e0389?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=634&q=80",
-                        "https://images.unsplash.com/photo-1613098169745-015562f6f27a?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=634&q=80",
-                        "https://images.unsplash.com/photo-1612979857678-0ce10e5b3439?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=1350&q=80",
-                        "https://images.unsplash.com/photo-1613066839141-4489f60e0389?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=634&q=80",
-                        "https://images.unsplash.com/photo-1613066839141-4489f60e0389?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=634&q=80"
+                        "https://cdns.iconmonstr.com/wp-content/assets/preview/2012/240/iconmonstr-sound-wave-4.png",
+                        "https://cdns.iconmonstr.com/wp-content/assets/preview/2012/240/iconmonstr-sound-wave-4.png",
+                        "https://cdns.iconmonstr.com/wp-content/assets/preview/2012/240/iconmonstr-sound-wave-4.png",
+                        "https://cdns.iconmonstr.com/wp-content/assets/preview/2012/240/iconmonstr-sound-wave-4.png",
+                        "https://cdns.iconmonstr.com/wp-content/assets/preview/2012/240/iconmonstr-sound-wave-4.png",
+                        "https://cdns.iconmonstr.com/wp-content/assets/preview/2012/240/iconmonstr-sound-wave-4.png",
                       ];
+                      requestStarted = false;
                     });
                   },
                 ),
