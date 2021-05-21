@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:finto_spoti/Screens/Login/login_screen.dart';
-import 'package:finto_spoti/Screens/Signup/signup_screen.dart';
-import 'package:finto_spoti/Screens/Welcome/components/background.dart';
-import 'package:finto_spoti/components/rounded_button.dart';
+import 'package:flows/Screens/Login/login_screen.dart';
+import 'package:flows/Screens/Signup/signup_screen.dart';
+import 'package:flows/Screens/Welcome/components/background.dart';
+import 'package:flows/components/rounded_button.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class Body extends StatelessWidget {

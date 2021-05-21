@@ -1,6 +1,6 @@
 {
-    "name": "finto_spoti",
-    "short_name": "finto_spoti",
+    "name": "flows",
+    "short_name": "flows",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tindercard/flutter_tindercard.dart';
-import 'package:finto_spoti/components/rounded_button.dart';
+import 'package:flows/components/rounded_button.dart';
 import 'card_manager.dart';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 
@@ -10,7 +10,7 @@ class CardScreen extends StatefulWidget {
 }
 
 class _CardScreenState extends State<CardScreen> {
-  CardManager _pageManager;
+  CardManager _cardManager;
   int currIndex = 0;
   bool swipeLeft = false,
       swipeRight = false,
@@ -33,12 +33,12 @@ class _CardScreenState extends State<CardScreen> {
   @override
   void initState() {
     super.initState();
-    _pageManager = new CardManager();
+    _cardManager = new CardManager();
   }
 
   @override
   void dispose() {
-    _pageManager.dispose();
+    _cardManager.dispose();
     super.dispose();
   }
 
@@ -84,7 +84,7 @@ class _CardScreenState extends State<CardScreen> {
                                 width: 300,
                                 child: ValueListenableBuilder<ProgressBarState>(
                                   valueListenable:
-                                      _pageManager.progressNotifier,
+                                      _cardManager.progressNotifier,
                                   builder: (_, value, __) {
                                     return ProgressBar(
                                       progress: value.current,
@@ -95,7 +95,7 @@ class _CardScreenState extends State<CardScreen> {
                                 ),
                               ),
                               ValueListenableBuilder<ButtonState>(
-                                valueListenable: _pageManager.buttonNotifier,
+                                valueListenable: _cardManager.buttonNotifier,
                                 builder: (_, value, __) {
                                   switch (value) {
                                     case ButtonState.loading:
@@ -109,13 +109,13 @@ class _CardScreenState extends State<CardScreen> {
                                       return IconButton(
                                         icon: Icon(Icons.play_arrow),
                                         iconSize: 32.0,
-                                        onPressed: _pageManager.play,
+                                        onPressed: _cardManager.play,
                                       );
                                     case ButtonState.playing:
                                       return IconButton(
                                         icon: Icon(Icons.pause),
                                         iconSize: 32.0,
-                                        onPressed: _pageManager.pause,
+                                        onPressed: _cardManager.pause,
                                       );
                                     default:
                                       return Container();

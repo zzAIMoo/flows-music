@@ -1,7 +1,7 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.example.finto_spoti">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.example.flows">
     <uses-permission android:name="android.permission.INTERNET"/>
     <application
-        android:label="finto_spoti"
+        android:label="flows"
         android:icon="@mipmap/ic_launcher"
         android:usesCleartextTraffic="true">
         <activity

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:finto_spoti/Screens/Login/login_screen.dart';
+import 'package:flows/Screens/Login/login_screen.dart';
 
 void main() => runApp(MyApp());
 
