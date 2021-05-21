@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tindercard/flutter_tindercard.dart';
 import 'package:finto_spoti/components/rounded_button.dart';
+import 'card_manager.dart';
+import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 
 class CardScreen extends StatefulWidget {
   @override
@@ -8,6 +10,7 @@ class CardScreen extends StatefulWidget {
 }
 
 class _CardScreenState extends State<CardScreen> {
+  CardManager _pageManager;
   int currIndex = 0;
   bool swipeLeft = false,
       swipeRight = false,
@@ -30,10 +33,12 @@ class _CardScreenState extends State<CardScreen> {
   @override
   void initState() {
     super.initState();
+    _pageManager = new CardManager();
   }
 
   @override
   void dispose() {
+    _pageManager.dispose();
     super.dispose();
   }
 
@@ -63,9 +68,9 @@ class _CardScreenState extends State<CardScreen> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
-                              new Container(
-                                width: 250.0,
-                                height: 250.0,
+                              Container(
+                                width: 150.0,
+                                height: 150.0,
                                 decoration: new BoxDecoration(
                                   shape: BoxShape.circle,
                                   image: new DecorationImage(
@@ -74,7 +79,49 @@ class _CardScreenState extends State<CardScreen> {
                                         '${songImages[index]}'),
                                   ),
                                 ),
-                              )
+                              ),
+                              SizedBox(
+                                width: 300,
+                                child: ValueListenableBuilder<ProgressBarState>(
+                                  valueListenable:
+                                      _pageManager.progressNotifier,
+                                  builder: (_, value, __) {
+                                    return ProgressBar(
+                                      progress: value.current,
+                                      buffered: value.buffered,
+                                      total: value.total,
+                                    );
+                                  },
+                                ),
+                              ),
+                              ValueListenableBuilder<ButtonState>(
+                                valueListenable: _pageManager.buttonNotifier,
+                                builder: (_, value, __) {
+                                  switch (value) {
+                                    case ButtonState.loading:
+                                      return Container(
+                                        margin: EdgeInsets.all(8.0),
+                                        width: 32.0,
+                                        height: 32.0,
+                                        child: CircularProgressIndicator(),
+                                      );
+                                    case ButtonState.paused:
+                                      return IconButton(
+                                        icon: Icon(Icons.play_arrow),
+                                        iconSize: 32.0,
+                                        onPressed: _pageManager.play,
+                                      );
+                                    case ButtonState.playing:
+                                      return IconButton(
+                                        icon: Icon(Icons.pause),
+                                        iconSize: 32.0,
+                                        onPressed: _pageManager.pause,
+                                      );
+                                    default:
+                                      return Container();
+                                  }
+                                },
+                              ),
                             ],
                           ),
                         )
@@ -86,8 +133,8 @@ class _CardScreenState extends State<CardScreen> {
                                   begin: FractionalOffset.topLeft,
                                   end: FractionalOffset.bottomRight,
                                   colors: <Color>[
-                                    Colors.red,
-                                    Colors.red[200],
+                                    Colors.black,
+                                    Colors.grey[400],
                                     Colors.white,
                                   ],
                                   tileMode: TileMode.clamp,
@@ -121,8 +168,8 @@ class _CardScreenState extends State<CardScreen> {
                                   begin: FractionalOffset.topRight,
                                   end: FractionalOffset.bottomLeft,
                                   colors: <Color>[
-                                    Colors.purple,
-                                    Colors.purple[200],
+                                    Colors.purple[300],
+                                    Colors.purple[100],
                                     Colors.white,
                                   ],
                                   tileMode: TileMode.clamp,

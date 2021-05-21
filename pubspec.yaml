@@ -39,6 +39,8 @@ dependencies:
   youtube_api: ^0.8.0
   flutter_search_bar: ^2.1.0
   shimmer: ^2.0.0
+  just_audio: ^0.7.4+1
+  audio_video_progress_bar: ^0.4.0
 
 dev_dependencies:
   flutter_test:

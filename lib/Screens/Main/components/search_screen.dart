@@ -16,7 +16,7 @@ class _SearchScreenState extends State<SearchScreen> {
   SearchBar searchBar;
   static String key = "AIzaSyBgARzrg0k-ro-BbdTxYfWuwvNtIC6osXA";
 
-  YoutubeAPI ytApi = YoutubeAPI(key, maxResults: 50);
+  YoutubeAPI ytApi = YoutubeAPI(key, maxResults: 8);
   List<YT_API> ytResult = [];
 
   AppBar buildAppBar(BuildContext context) {
@@ -103,45 +103,49 @@ class _SearchScreenState extends State<SearchScreen> {
           itemCount: results.length,
           itemBuilder: !isPerformingRequest
               ? (_, int index) => listItem(index)
-              : (_, int index) => shimmerItems(),
+              : (_, int index) => shimmerItems(index),
           controller: _scrollController,
         ),
       ),
     );
   }
 
-  Widget shimmerItems() {
-    return Card(
-      child: Container(
-        margin: EdgeInsets.symmetric(vertical: 7.0),
-        padding: EdgeInsets.all(12.0),
-        child: Shimmer.fromColors(
-          baseColor: Colors.grey,
-          highlightColor: Colors.white,
-          child: Row(
-            children: <Widget>[
-              ClipRRect(
-                borderRadius: BorderRadius.circular(20.0), //or 15.0
-                child: Container(
-                  height: 70.0,
-                  width: 70.0,
-                  color: Color(0xffFF0E58),
+  Widget shimmerItems(index) {
+    if (index < 6) {
+      return Card(
+        child: Container(
+          margin: EdgeInsets.symmetric(vertical: 7.0),
+          padding: EdgeInsets.all(12.0),
+          child: Shimmer.fromColors(
+            baseColor: Colors.grey,
+            highlightColor: Colors.white,
+            child: Row(
+              children: <Widget>[
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(20.0), //or 15.0
+                  child: Container(
+                    height: 70.0,
+                    width: 70.0,
+                    color: Color(0xffFF0E58),
+                  ),
                 ),
-              ),
-              Padding(padding: EdgeInsets.only(right: 20.0)),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(20.0), //or 15.0
-                child: Container(
-                  height: 10.0,
-                  width: 80.0,
-                  color: Color(0xffFF0E58),
+                Padding(padding: EdgeInsets.only(right: 20.0)),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(20.0), //or 15.0
+                  child: Container(
+                    height: 10.0,
+                    width: 80.0,
+                    color: Color(0xffFF0E58),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
-      ),
-    );
+      );
+    } else {
+      return Container();
+    }
   }
 
   Widget listItem(index) {
