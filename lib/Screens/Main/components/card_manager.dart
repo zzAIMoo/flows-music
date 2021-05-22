@@ -57,6 +57,10 @@ class CardManager {
     });
   }
 
+  void setUrl(String url) async {
+    await _audioPlayer.setUrl(url);
+  }
+
   void play() {
     _audioPlayer.play();
   }
