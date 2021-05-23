@@ -101,7 +101,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
             child: Row(
               children: <Widget>[
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(20.0), //or 15.0
+                  borderRadius: BorderRadius.circular(20.0),
                   child: Container(
                     height: 70.0,
                     width: 70.0,
@@ -110,7 +110,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
                 ),
                 Padding(padding: EdgeInsets.only(right: 20.0)),
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(20.0), //or 15.0
+                  borderRadius: BorderRadius.circular(20.0),
                   child: Container(
                     height: 10.0,
                     width: 80.0,
