@@ -2,8 +2,8 @@ import 'package:flows/Screens/Login/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flows/components/rounded_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:shimmer/shimmer.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 import 'dart:math';
@@ -46,35 +46,30 @@ class _LibraryScreenState extends State<LibraryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: ListView.builder(
-        itemCount: playlistsNumber,
-        itemBuilder: !requestStarted ? (_, int index) => playlists[index] : (_, int index) => shimmerItems(index),
-        controller: _scrollController,
+    return Scaffold(
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          RoundedButton(
+            text: "CREATE FAKE PLAYLIST",
+            textColor: Colors.white,
+            isLoading: requestStarted,
+            press: () {
+              createPlaylist(generateRandomString(5));
+            },
+          ),
+          Container(
+            child: Expanded(
+              child: ListView.builder(
+                itemCount: playlistsNumber,
+                itemBuilder: (_, int index) => playlists[index],
+                controller: _scrollController,
+              ),
+            ),
+          ),
+        ],
       ),
-    );
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        RoundedButton(
-          text: "CREATE FAKE PLAYLIST",
-          textColor: Colors.white,
-          isLoading: requestStarted,
-          press: () {
-            createPlaylist(generateRandomString(5));
-          },
-        ),
-        RoundedButton(
-          text: "RECEIVE YOUR PLAYLISTS",
-          textColor: Colors.white,
-          isLoading: requestStarted,
-          press: () {
-            receivePlaylists();
-          },
-        ),
-      ],
     );
   }
 
@@ -101,7 +96,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
             child: Row(
               children: <Widget>[
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(20.0),
+                  borderRadius: BorderRadius.circular(20.0), //or 15.0
                   child: Container(
                     height: 70.0,
                     width: 70.0,
@@ -110,7 +105,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
                 ),
                 Padding(padding: EdgeInsets.only(right: 20.0)),
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(20.0),
+                  borderRadius: BorderRadius.circular(20.0), //or 15.0
                   child: Container(
                     height: 10.0,
                     width: 80.0,
@@ -130,7 +125,8 @@ class _LibraryScreenState extends State<LibraryScreen> {
   receivePlaylists() async {
     requestStarted = true;
     setState(() {});
-    var url = Uri.parse('https://sechisimone.altervista.org/flows/API/read/get_user_playlists.php');
+    var url = Uri.parse(
+        'https://sechisimone.altervista.org/flows/API/read/get_user_playlists.php');
     var response = await http.post(url, body: {
       'access_token': accessToken,
     });
@@ -138,12 +134,10 @@ class _LibraryScreenState extends State<LibraryScreen> {
     print('Response body: ${response.body}');
     if (response.statusCode == 200) {
       var responseParsed = convert.jsonDecode(response.body);
+      print(responseParsed);
       if (responseParsed["response_type"] == "received_correctly") {
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setString('access_token', responseParsed["response_body"]["access_token"].toString());
         var tmp = responseParsed["response_body"]["playlists"];
         playlistsNumber = tmp.length;
-        print(tmp.length);
         tmp.forEach((element) {
           playlists.add(
             Card(
@@ -152,56 +146,67 @@ class _LibraryScreenState extends State<LibraryScreen> {
                 padding: EdgeInsets.all(12.0),
                 child: Row(
                   children: <Widget>[
-                    Padding(
-                      padding: EdgeInsets.only(right: 20.0),
-                    ),
+                    /*Image.network(
+                      "https://cdns.iconmonstr.com/wp-content/assets/preview/2012/240/iconmonstr-sound-wave-4.png",
+                    ),*/
+                    Padding(padding: EdgeInsets.only(right: 20.0)),
                     Expanded(
-                        child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          element["playlist_name"],
-                          softWrap: true,
-                          style: TextStyle(fontSize: 18.0),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(right: 20.0),
-                        ),
-                        Text(
-                          element["playlist_description"],
-                          softWrap: true,
-                        ),
-                      ],
-                    ))
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            element['playlist_name'],
+                            softWrap: true,
+                            style: TextStyle(fontSize: 18.0),
+                          ),
+                          Padding(padding: EdgeInsets.only(bottom: 1.5)),
+                          Text(
+                            element['playlist_description'],
+                            softWrap: true,
+                          ),
+                        ],
+                      ),
+                    )
                   ],
                 ),
               ),
             ),
           );
+          print(element);
         });
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString('access_token',
+            responseParsed["response_body"]["access_token"].toString());
         requestStarted = false;
         setState(() {});
         return;
       } else if (responseParsed["response_type"] == "error_in_retrieving") {
+        print(responseParsed);
         showToast("C'è stato un errore nella ricezione delle tue playlists");
         SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setString('access_token', responseParsed["response_body"]["access_token"].toString());
+        prefs.setString('access_token',
+            responseParsed["response_body"]["access_token"].toString());
         requestStarted = false;
         setState(() {});
         return;
       } else if (responseParsed["response_type"] == "access_token_expired") {
-        var url = Uri.parse('https://sechisimone.altervista.org/flows/API/OAuth/get_access_token.php');
+        var url = Uri.parse(
+            'https://sechisimone.altervista.org/flows/API/OAuth/get_access_token.php');
         var response = await http.post(url, body: {
           'refresh_token': refreshToken,
         });
         if (response.statusCode == 200) {
+          print(response.body);
           var responseParsed = convert.jsonDecode(response.body);
-          if (responseParsed["response_type"] == "access_token_created_correctly") {
+          if (responseParsed["response_type"] ==
+              "access_token_created_correctly") {
             SharedPreferences prefs = await SharedPreferences.getInstance();
-            prefs.setString('access_token', responseParsed["response_body"]["access_token"]);
+            prefs.setString('access_token',
+                responseParsed["response_body"]["access_token"]);
             receivePlaylists();
-          } else if (responseParsed["response_type"] == "refresh_token_expired") {
+          } else if (responseParsed["response_type"] ==
+              "refresh_token_expired") {
             showToast("Token Expired, logging out of the account");
             SharedPreferences prefs = await SharedPreferences.getInstance();
             prefs.clear();
@@ -222,7 +227,8 @@ class _LibraryScreenState extends State<LibraryScreen> {
   createPlaylist(playlistName) async {
     requestStarted = true;
     setState(() {});
-    var url = Uri.parse('https://sechisimone.altervista.org/flows/API/create/add_playlist.php');
+    var url = Uri.parse(
+        'https://sechisimone.altervista.org/flows/API/create/add_playlist.php');
     var response = await http.post(url, body: {
       'name': playlistName,
       'description': "descrizione",
@@ -235,29 +241,35 @@ class _LibraryScreenState extends State<LibraryScreen> {
       if (responseParsed["response_type"] == "playlist_added") {
         showToast("Playlist creata correttamente con il nome " + playlistName);
         SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setString('access_token', responseParsed["response_body"]["access_token"].toString());
+        prefs.setString('access_token',
+            responseParsed["response_body"]["access_token"].toString());
         requestStarted = false;
         setState(() {});
         return;
       } else if (responseParsed["response_type"] == "error_in_adding") {
         showToast("C'è stato un errore nella creazione della playlist");
         SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setString('access_token', responseParsed["response_body"]["access_token"].toString());
+        prefs.setString('access_token',
+            responseParsed["response_body"]["access_token"].toString());
         requestStarted = false;
         setState(() {});
         return;
       } else if (responseParsed["response_type"] == "access_token_expired") {
-        var url = Uri.parse('https://sechisimone.altervista.org/flows/API/OAuth/get_access_token.php');
+        var url = Uri.parse(
+            'https://sechisimone.altervista.org/flows/API/OAuth/get_access_token.php');
         var response = await http.post(url, body: {
           'refresh_token': refreshToken,
         });
         if (response.statusCode == 200) {
           var responseParsed = convert.jsonDecode(response.body);
-          if (responseParsed["response_type"] == "access_token_created_correctly") {
+          if (responseParsed["response_type"] ==
+              "access_token_created_correctly") {
             SharedPreferences prefs = await SharedPreferences.getInstance();
-            prefs.setString('access_token', responseParsed["response_body"]["access_token"]);
+            prefs.setString('access_token',
+                responseParsed["response_body"]["access_token"]);
             createPlaylist(playlistName);
-          } else if (responseParsed["response_type"] == "refresh_token_expired") {
+          } else if (responseParsed["response_type"] ==
+              "refresh_token_expired") {
             showToast("Token Expired, logging out of the account");
             SharedPreferences prefs = await SharedPreferences.getInstance();
             prefs.clear();
@@ -277,7 +289,9 @@ class _LibraryScreenState extends State<LibraryScreen> {
 
   String generateRandomString(int len) {
     var r = Random();
-    const _chars = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
-    return List.generate(len, (index) => _chars[r.nextInt(_chars.length)]).join();
+    const _chars =
+        'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
+    return List.generate(len, (index) => _chars[r.nextInt(_chars.length)])
+        .join();
   }
 }

@@ -169,6 +169,24 @@ class _SearchScreenState extends State<SearchScreen> {
                     softWrap: true,
                     style: TextStyle(fontSize: 18.0),
                   ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Container(
+                        child: MaterialButton(
+                          onPressed: () {},
+                          color: Color(0xFF6F35A5),
+                          textColor: Colors.white,
+                          child: Icon(
+                            Icons.file_download,
+                            size: 16,
+                          ),
+                          shape: CircleBorder(),
+                        ),
+                        margin: EdgeInsets.only(top: 15.0),
+                      ),
+                    ],
+                  ),
                   Padding(padding: EdgeInsets.only(bottom: 1.5)),
                   Text(
                     results[index].channelTitle,

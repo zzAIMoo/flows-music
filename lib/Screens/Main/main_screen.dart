@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'components/search_screen.dart';
 import 'components/card_screen.dart';
 import 'components/library_screen.dart';
+import 'package:flows/Screens/Settings/settings_screen.dart';
 //import 'package:image/image.dart' as IMG;
 
 void main() {}
@@ -53,9 +54,47 @@ class _MainScreenPageState extends State<MainScreenPage> {
     return Scaffold(
       appBar: _selectedIndex == 1
           ? null
-          : AppBar(
-              title: Text('Flows'),
-            ),
+          : _selectedIndex == 0
+              ? AppBar(
+                  actions: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        IconButton(
+                            icon: Icon(Icons.settings),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => SettingsScreen()),
+                              );
+                            }),
+                      ],
+                    ),
+                  ],
+                  title: Text('Suggestions'),
+                )
+              : _selectedIndex == 2
+                  ? AppBar(
+                      actions: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            IconButton(
+                                icon: Icon(Icons.settings),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => SettingsScreen()),
+                                  );
+                                }),
+                          ],
+                        ),
+                      ],
+                      title: Text('Library'),
+                    )
+                  : null,
       body: Center(
         child: buildPage(context).elementAt(_selectedIndex),
       ),
