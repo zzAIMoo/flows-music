@@ -157,9 +157,12 @@ class _BodyState extends State<Body> {
                     print(responseParsed["response_body"]["access_token"]);
                     requestStarted = false;
                     setState(() {});
-                    Navigator.pushReplacement(
+                    Navigator.pushAndRemoveUntil(
                       context,
-                      MaterialPageRoute(builder: (context) => MainScreen()),
+                      MaterialPageRoute(
+                        builder: (context) => MainScreen(),
+                      ),
+                      (Route route) => false,
                     );
                   }
                 }

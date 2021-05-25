@@ -85,81 +85,105 @@ class _BodyState extends State<Body> {
   void initState() {
     super.initState();
     getSharedPrefs();
-    getUserInfo();
+    //getUserInfo();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Column(
+    return Column(
+      children: [
+        Container(
+          margin: EdgeInsets.only(top: 25.0),
+          width: 150.0,
+          height: 150.0,
+          decoration: new BoxDecoration(
+            shape: BoxShape.circle,
+            image: new DecorationImage(
+              fit: BoxFit.fill,
+              image: Image.asset("assets/images/default_user_img.png").image,
+            ),
+          ),
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              margin: EdgeInsets.only(top: 25.0),
-              width: 150.0,
-              height: 150.0,
-              decoration: new BoxDecoration(
-                shape: BoxShape.circle,
-                image: new DecorationImage(
-                  fit: BoxFit.fill,
-                  image: Image.asset("assets/images/default_user_img.png").image,
-                ),
+              child: Text(
+                "Username",
+                style: TextStyle(fontSize: 22),
               ),
+              margin: EdgeInsets.only(top: 15.0, left: 70.0),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  child: Text(
-                    "Username",
-                    style: TextStyle(fontSize: 22),
-                  ),
-                  margin: EdgeInsets.only(top: 15.0, left: 70.0),
+            Container(
+              child: MaterialButton(
+                onPressed: () {},
+                color: Color(0xFF6F35A5),
+                textColor: Colors.white,
+                child: Icon(
+                  Icons.edit,
+                  size: 16,
                 ),
-                Container(
-                  child: MaterialButton(
-                    onPressed: () {},
-                    color: Color(0xFF6F35A5),
-                    textColor: Colors.white,
-                    child: Icon(
-                      Icons.edit,
-                      size: 16,
-                    ),
-                    shape: CircleBorder(),
-                  ),
-                  margin: EdgeInsets.only(top: 15.0),
-                ),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  child: Text(
-                    "Password: *****",
-                    style: TextStyle(fontSize: 22),
-                  ),
-                  margin: EdgeInsets.only(top: 15.0, left: 70.0),
-                ),
-                Container(
-                  child: MaterialButton(
-                    onPressed: () {},
-                    color: Color(0xFF6F35A5),
-                    textColor: Colors.white,
-                    child: Icon(
-                      Icons.edit,
-                      size: 16,
-                    ),
-                    shape: CircleBorder(),
-                  ),
-                  margin: EdgeInsets.only(top: 15.0),
-                ),
-              ],
+                shape: CircleBorder(),
+              ),
+              margin: EdgeInsets.only(top: 15.0),
             ),
           ],
         ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              child: Text(
+                "Password: *****",
+                style: TextStyle(fontSize: 22),
+              ),
+              margin: EdgeInsets.only(top: 15.0, left: 70.0),
+            ),
+            Container(
+              child: MaterialButton(
+                onPressed: () {},
+                color: Color(0xFF6F35A5),
+                textColor: Colors.white,
+                child: Icon(
+                  Icons.edit,
+                  size: 16,
+                ),
+                shape: CircleBorder(),
+              ),
+              margin: EdgeInsets.only(top: 15.0),
+            ),
+          ],
+        ),
+        Expanded(
+          child: Align(
+            alignment: Alignment.bottomCenter,
+            child: RoundedButton(
+              text: "LOGOUT",
+              textColor: Colors.white,
+              isLoading: requestStarted,
+              press: () {
+                logout();
+              },
+            ),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.only(bottom: 50),
+        ),
       ],
+    );
+  }
+
+  void logout() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    requestStarted = false;
+    prefs.clear();
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(
+        builder: (context) => LoginScreen(),
+      ),
+      (Route route) => false,
     );
   }
 
