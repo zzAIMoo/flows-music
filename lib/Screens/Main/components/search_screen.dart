@@ -4,6 +4,7 @@ import 'package:youtube_api/youtube_api.dart';
 import 'package:flutter_search_bar/flutter_search_bar.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:loading_animations/loading_animations.dart';
 
 List<YT_API> results = [];
 
@@ -119,9 +120,10 @@ class _SearchScreenState extends State<SearchScreen> {
                   ),
                   Center(
                     child: Container(
-                      child: SpinKitCircle(
-                        color: Color(0xFF6F35A5),
-                        size: 30,
+                      child: LoadingRotating.square(
+                        size: 10.0,
+                        borderColor: Color(0xFF6F35A5),
+                        backgroundColor: Color(0xFF6F35A5),
                       ),
                     ),
                   ),

@@ -43,9 +43,9 @@ class _BodyState extends State<Body> {
           var responseParsed = convert.jsonDecode(response.body);
           if (responseParsed["response_type"] == "loggedin_correctly") {
             SharedPreferences prefs = await SharedPreferences.getInstance();
-            prefs.setString('access_token', responseParsed["response_body"]["access_token"]);
+            await prefs.setString('access_token', responseParsed["response_body"]["access_token"]);
             if (wantsToSavePassword) {
-              prefs.setString('refresh_token', responseParsed["response_body"]["refresh_token"]);
+              await prefs.setString('refresh_token', responseParsed["response_body"]["refresh_token"]);
             }
             requestStarted = false;
             setState(() {});
@@ -147,12 +147,12 @@ class _BodyState extends State<Body> {
                     return;
                   } else if (responseParsed["response_type"] == "loggedin_correctly") {
                     SharedPreferences prefs = await SharedPreferences.getInstance();
-                    prefs.setString('access_token', responseParsed["response_body"]["access_token"]);
+                    await prefs.setString('access_token', responseParsed["response_body"]["access_token"]);
                     if (wantsToSavePassword) {
                       if (prefs.containsKey("refresh_token")) {
                         prefs.remove("refresh_token");
                       }
-                      prefs.setString('refresh_token', responseParsed["response_body"]["refresh_token"]);
+                      await prefs.setString('refresh_token', responseParsed["response_body"]["refresh_token"]);
                     }
                     print(responseParsed["response_body"]["access_token"]);
                     requestStarted = false;

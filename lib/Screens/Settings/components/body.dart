@@ -30,8 +30,7 @@ class _BodyState extends State<Body> {
   getUserInfo() async {
     requestStarted = true;
     setState(() {});
-    var url = Uri.parse(
-        'https://sechisimone.altervista.org/flows/API/read/get_user_info.php');
+    var url = Uri.parse('https://sechisimone.altervista.org/flows/API/read/get_user_info.php');
     var response = await http.post(url, body: {
       'access_token': accessToken,
     });
@@ -41,36 +40,30 @@ class _BodyState extends State<Body> {
       var responseParsed = convert.jsonDecode(response.body);
       if (responseParsed["response_type"] == "received_correctly") {
         SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setString('access_token',
-            responseParsed["response_body"]["access_token"].toString());
+        await prefs.setString('access_token', responseParsed["response_body"]["access_token"].toString());
         requestStarted = false;
         setState(() {});
         return;
       } else if (responseParsed["response_type"] == "error_in_retrieving") {
         showToast("C'è stato un errore nella ricezione dei tuoi dati");
         SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setString('access_token',
-            responseParsed["response_body"]["access_token"].toString());
+        await prefs.setString('access_token', responseParsed["response_body"]["access_token"].toString());
         requestStarted = false;
         setState(() {});
         return;
       } else if (responseParsed["response_type"] == "access_token_expired") {
-        var url = Uri.parse(
-            'https://sechisimone.altervista.org/flows/API/OAuth/get_access_token.php');
+        var url = Uri.parse('https://sechisimone.altervista.org/flows/API/OAuth/get_access_token.php');
         var response = await http.post(url, body: {
           'refresh_token': refreshToken,
         });
         if (response.statusCode == 200) {
           print(response.body);
           var responseParsed = convert.jsonDecode(response.body);
-          if (responseParsed["response_type"] ==
-              "access_token_created_correctly") {
+          if (responseParsed["response_type"] == "access_token_created_correctly") {
             SharedPreferences prefs = await SharedPreferences.getInstance();
-            prefs.setString('access_token',
-                responseParsed["response_body"]["access_token"]);
+            await prefs.setString('access_token', responseParsed["response_body"]["access_token"]);
             getUserInfo();
-          } else if (responseParsed["response_type"] ==
-              "refresh_token_expired") {
+          } else if (responseParsed["response_type"] == "refresh_token_expired") {
             showToast("Token Expired, logging out of the account");
             SharedPreferences prefs = await SharedPreferences.getInstance();
             prefs.clear();
@@ -110,8 +103,7 @@ class _BodyState extends State<Body> {
                 shape: BoxShape.circle,
                 image: new DecorationImage(
                   fit: BoxFit.fill,
-                  image:
-                      Image.asset("assets/images/default_user_img.png").image,
+                  image: Image.asset("assets/images/default_user_img.png").image,
                 ),
               ),
             ),
