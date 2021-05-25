@@ -32,8 +32,7 @@ class _BodyState extends State<Body> {
         refreshToken = prefs.getString("refresh_token");
         print(refreshToken);
         requestStarted = true;
-        var url = Uri.parse(
-            'https://sechisimone.altervista.org/flows/API/registration/signin.php');
+        var url = Uri.parse('https://sechisimone.altervista.org/flows/API/registration/signin.php');
         var response = await http.post(
           url,
           body: {'refresh_token': refreshToken},
@@ -44,11 +43,9 @@ class _BodyState extends State<Body> {
           var responseParsed = convert.jsonDecode(response.body);
           if (responseParsed["response_type"] == "loggedin_correctly") {
             SharedPreferences prefs = await SharedPreferences.getInstance();
-            prefs.setString('access_token',
-                responseParsed["response_body"]["access_token"]);
+            prefs.setString('access_token', responseParsed["response_body"]["access_token"]);
             if (wantsToSavePassword) {
-              prefs.setString('refresh_token',
-                  responseParsed["response_body"]["refresh_token"]);
+              prefs.setString('refresh_token', responseParsed["response_body"]["refresh_token"]);
             }
             requestStarted = false;
             setState(() {});
@@ -68,7 +65,7 @@ class _BodyState extends State<Body> {
   @override
   void initState() {
     super.initState();
-    //getSharedPrefs();
+    getSharedPrefs();
   }
 
   @override
@@ -115,8 +112,7 @@ class _BodyState extends State<Body> {
               children: [
                 Text("Keep me logged in!"),
                 Checkbox(
-                  fillColor: MaterialStateColor.resolveWith(
-                      (states) => Color(0xFF6F35A5)),
+                  fillColor: MaterialStateColor.resolveWith((states) => Color(0xFF6F35A5)),
                   checkColor: Colors.white,
                   value: wantsToSavePassword,
                   onChanged: (newValue) {
@@ -133,38 +129,30 @@ class _BodyState extends State<Body> {
               press: () async {
                 requestStarted = true;
                 setState(() {});
-                var url = Uri.parse(
-                    'https://sechisimone.altervista.org/flows/API/registration/signin.php');
-                var response = await http
-                    .post(url, body: {'email': email, 'password': psw});
+                var url = Uri.parse('https://sechisimone.altervista.org/flows/API/registration/signin.php');
+                var response = await http.post(url, body: {'email': email, 'password': psw});
                 print('Response status: ${response.statusCode}');
                 print('Response body: ${response.body}');
                 if (response.statusCode == 200) {
                   var responseParsed = convert.jsonDecode(response.body);
                   if (responseParsed["response_type"] == "error_logging_in") {
-                    showToast(
-                        "C'è stato un errore nel login, si è pregati di riprovare con altri dati");
+                    showToast("C'è stato un errore nel login, si è pregati di riprovare con altri dati");
                     requestStarted = false;
                     setState(() {});
                     return;
                   } else if (responseParsed["response_type"] == "email_error") {
-                    showToast(
-                        "Ci sono problemi con i server, si è pregati di riprovare più tardi");
+                    showToast("Ci sono problemi con i server, si è pregati di riprovare più tardi");
                     requestStarted = false;
                     setState(() {});
                     return;
-                  } else if (responseParsed["response_type"] ==
-                      "loggedin_correctly") {
-                    SharedPreferences prefs =
-                        await SharedPreferences.getInstance();
-                    prefs.setString('access_token',
-                        responseParsed["response_body"]["access_token"]);
+                  } else if (responseParsed["response_type"] == "loggedin_correctly") {
+                    SharedPreferences prefs = await SharedPreferences.getInstance();
+                    prefs.setString('access_token', responseParsed["response_body"]["access_token"]);
                     if (wantsToSavePassword) {
                       if (prefs.containsKey("refresh_token")) {
                         prefs.remove("refresh_token");
                       }
-                      prefs.setString('refresh_token',
-                          responseParsed["response_body"]["refresh_token"]);
+                      prefs.setString('refresh_token', responseParsed["response_body"]["refresh_token"]);
                     }
                     print(responseParsed["response_body"]["access_token"]);
                     requestStarted = false;
