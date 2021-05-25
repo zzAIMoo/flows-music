@@ -3,6 +3,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:youtube_api/youtube_api.dart';
 import 'package:flutter_search_bar/flutter_search_bar.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 List<YT_API> results = [];
 
@@ -13,7 +14,7 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   ScrollController _scrollController = new ScrollController();
-  bool isPerformingRequest = false;
+  bool isPerformingRequest = false, addedShimmer = false;
   SearchBar searchBar;
   static String key = "AIzaSyBgARzrg0k-ro-BbdTxYfWuwvNtIC6osXA";
 
@@ -72,7 +73,7 @@ class _SearchScreenState extends State<SearchScreen> {
   void initState() {
     super.initState();
     _scrollController.addListener(() {
-      if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 60) {
+      if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 50) {
         _getMoreData();
       }
     });
@@ -109,7 +110,30 @@ class _SearchScreenState extends State<SearchScreen> {
       body: Container(
         child: ListView.builder(
           itemCount: results.length,
-          itemBuilder: (_, int index) => listItem(index),
+          itemBuilder: (_, int index) {
+            if (index == results.length - 1) {
+              return Column(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.all(10),
+                  ),
+                  Center(
+                    child: Container(
+                      child: SpinKitCircle(
+                        color: Color(0xFF6F35A5),
+                        size: 30,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(10),
+                  ),
+                ],
+              );
+            } else {
+              return listItem(index);
+            }
+          },
           controller: _scrollController,
         ),
       ),
@@ -119,112 +143,116 @@ class _SearchScreenState extends State<SearchScreen> {
   //Widget shimmerItems(index) {}
 
   Widget listItem(index) {
-    return !isPerformingRequest
-        ? Card(
-            child: Container(
-              margin: EdgeInsets.symmetric(vertical: 7.0),
-              padding: EdgeInsets.all(12.0),
-              child: Row(
+    return Card(
+      child: Container(
+        margin: EdgeInsets.symmetric(vertical: 7.0),
+        padding: EdgeInsets.all(12.0),
+        child: Row(
+          children: <Widget>[
+            Image.network(
+              results[index].thumbnail['default']['url'],
+              width: 100,
+            ),
+            Padding(padding: EdgeInsets.only(right: 20.0)),
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Image.network(
-                    results[index].thumbnail['default']['url'],
-                    width: 100,
-                  ),
-                  Padding(padding: EdgeInsets.only(right: 20.0)),
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Row(
-                          children: [
-                            Container(
-                              width: MediaQuery.of(context).size.width / 2.6,
-                              child: Text(
-                                results[index].title,
-                                softWrap: true,
-                                style: TextStyle(fontSize: 14.0),
-                              ),
-                            ),
-                            MaterialButton(
-                              onPressed: () {},
-                              color: Color(0xFF6F35A5),
-                              textColor: Colors.white,
-                              child: Icon(
-                                Icons.file_download,
-                                size: 16,
-                              ),
-                              shape: CircleBorder(),
-                            ),
-                          ],
-                        ),
-                        Padding(padding: EdgeInsets.only(bottom: 1.5)),
-                        Text(
-                          results[index].channelTitle,
+                  Row(
+                    children: [
+                      Container(
+                        width: MediaQuery.of(context).size.width / 2.6,
+                        child: Text(
+                          results[index].title,
                           softWrap: true,
-                          style: TextStyle(fontSize: 10.0),
+                          style: TextStyle(fontSize: 14.0),
                         ),
-                        /*
+                      ),
+                      MaterialButton(
+                        onPressed: () {},
+                        color: Color(0xFF6F35A5),
+                        textColor: Colors.white,
+                        child: Icon(
+                          Icons.file_download,
+                          size: 16,
+                        ),
+                        shape: CircleBorder(),
+                      ),
+                    ],
+                  ),
+                  Padding(padding: EdgeInsets.only(bottom: 1.5)),
+                  Text(
+                    results[index].channelTitle,
+                    softWrap: true,
+                    style: TextStyle(fontSize: 10.0),
+                  ),
+                  /*
               Padding(padding: EdgeInsets.only(bottom: 3.0)),
               Text(
                 ytResult[index].url,
                 softWrap: true,
               ),
               */
-                      ],
-                    ),
-                  )
                 ],
               ),
-            ),
-          )
-        : Card(
-            child: Container(
-              margin: EdgeInsets.symmetric(vertical: 7.0),
-              padding: EdgeInsets.all(12.0),
-              child: Shimmer.fromColors(
-                baseColor: Colors.grey,
-                highlightColor: Colors.white,
-                child: Row(
-                  children: <Widget>[
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(20.0), //or 15.0
-                      child: Container(
-                        height: 70.0,
-                        width: 70.0,
-                        color: Color(0xffFF0E58),
-                      ),
-                    ),
-                    Padding(padding: EdgeInsets.only(right: 15.0)),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(15.0), //or 15.0
-                          child: Container(
-                            height: 14.0,
-                            width: MediaQuery.of(context).size.width / 2,
-                            color: Color(0xffFF0E58),
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(top: 10),
-                        ),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(15.0), //or 15.0
-                          child: Container(
-                            height: 8.0,
-                            width: 20,
-                            color: Color(0xffFF0E58),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget returnShimmer() {
+    addedShimmer = true;
+    print(addedShimmer);
+    return Card(
+      child: Container(
+        margin: EdgeInsets.symmetric(vertical: 7.0),
+        padding: EdgeInsets.all(12.0),
+        child: Shimmer.fromColors(
+          baseColor: Colors.grey,
+          highlightColor: Colors.white,
+          child: Row(
+            children: <Widget>[
+              ClipRRect(
+                borderRadius: BorderRadius.circular(20.0), //or 15.0
+                child: Container(
+                  height: 70.0,
+                  width: 70.0,
+                  color: Color(0xffFF0E58),
                 ),
               ),
-            ),
-          );
+              Padding(padding: EdgeInsets.only(right: 15.0)),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(15.0), //or 15.0
+                    child: Container(
+                      height: 14.0,
+                      width: MediaQuery.of(context).size.width / 2,
+                      color: Color(0xffFF0E58),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(top: 10),
+                  ),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(15.0), //or 15.0
+                    child: Container(
+                      height: 8.0,
+                      width: 20,
+                      color: Color(0xffFF0E58),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   void showToast(String message) {
