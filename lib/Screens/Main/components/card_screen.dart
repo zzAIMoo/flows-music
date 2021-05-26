@@ -32,7 +32,8 @@ class _CardScreenState extends State<CardScreen> {
 
   List<String> urls = [
     'https://sechisimone.altervista.org/flows/songs/RADICAL__MINACCIA.mp3',
-    "http://135.125.44.178/songs/a3b44c0172b8c62e9fc621ecbb72bacf.mp3"
+    "http://135.125.44.178/songs/a3b44c0172b8c62e9fc621ecbb72bacf.mp3",
+    "http://135.125.44.178/songs/77f793ad27389e97f5b32e2103b8da7e.mp3"
   ];
 
   @override

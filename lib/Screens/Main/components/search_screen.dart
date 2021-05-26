@@ -4,6 +4,8 @@ import 'package:youtube_api/youtube_api.dart';
 import 'package:flutter_search_bar/flutter_search_bar.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:loading_animations/loading_animations.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert' as convert;
 
 List<YT_API> results = [];
 
@@ -14,7 +16,7 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   ScrollController _scrollController = new ScrollController();
-  bool isPerformingRequest = false, addedShimmer = false;
+  bool isPerformingRequest = false, addedShimmer = false, downloadStarted = false;
   SearchBar searchBar;
   static String key = "AIzaSyBgARzrg0k-ro-BbdTxYfWuwvNtIC6osXA";
 
@@ -170,18 +172,37 @@ class _SearchScreenState extends State<SearchScreen> {
                           style: TextStyle(fontSize: 14.0),
                         ),
                       ),
-                      MaterialButton(
-                        onPressed: () {
-                          //results[index].id
-                        },
-                        color: Color(0xFF6F35A5),
-                        textColor: Colors.white,
-                        child: Icon(
-                          Icons.file_download,
-                          size: 16,
-                        ),
-                        shape: CircleBorder(),
-                      ),
+                      !downloadStarted
+                          ? MaterialButton(
+                              onPressed: () async {
+                                downloadStarted = true;
+                                var url = Uri.parse('http://135.125.44.178:5000/url?id=' + results[index].id);
+                                var response = await http.get(url);
+                                print('Response status: ${response.statusCode}');
+                                print('Response body: ${response.body}');
+                                if (response.statusCode == 200) {
+                                  print(response);
+                                  downloadStarted = false;
+                                  //results[index].id
+                                }
+                              },
+                              color: Color(0xFF6F35A5),
+                              textColor: Colors.white,
+                              child: Icon(
+                                Icons.file_download,
+                                size: 16,
+                              ),
+                              shape: CircleBorder(),
+                            )
+                          : Center(
+                              child: Container(
+                                child: LoadingRotating.square(
+                                  size: 10.0,
+                                  borderColor: Color(0xFF6F35A5),
+                                  backgroundColor: Color(0xFF6F35A5),
+                                ),
+                              ),
+                            ),
                     ],
                   ),
                   Padding(padding: EdgeInsets.only(bottom: 1.5)),
