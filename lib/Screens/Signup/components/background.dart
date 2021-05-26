@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
+//import 'dart:async';
 import 'dart:math';
 
 // ignore: must_be_immutable
@@ -25,8 +25,7 @@ class _BackgroundState extends State<Background> {
   void initState() {
     super.initState();
     millisecPause = 1000 ~/ maxFrame;
-    print("ciao");
-    Timer.periodic(Duration(milliseconds: millisecPause), (timer) {
+    /*Timer.periodic(Duration(milliseconds: millisecPause), (timer) {
       if (animFrame == maxFrame) {
         setState(() {
           posneg = -1;
@@ -40,7 +39,7 @@ class _BackgroundState extends State<Background> {
         animFrame += posneg;
       });
       print(animFrame);
-    });
+    });*/
   }
 
   @override
@@ -53,7 +52,7 @@ class _BackgroundState extends State<Background> {
       child: Stack(
         alignment: Alignment.center,
         children: <Widget>[
-          AnimatedPositioned(
+          /*AnimatedPositioned(
             curve: Curves.easeInExpo,
             top: animFrame.toDouble(),
             left: animFrame
@@ -74,7 +73,7 @@ class _BackgroundState extends State<Background> {
                 anim = !anim;
               });
             },
-          ),
+          ),*/
           Positioned(
             top: 0,
             left: 0,
