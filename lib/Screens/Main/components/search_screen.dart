@@ -171,7 +171,9 @@ class _SearchScreenState extends State<SearchScreen> {
                         ),
                       ),
                       MaterialButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          //results[index].id
+                        },
                         color: Color(0xFF6F35A5),
                         textColor: Colors.white,
                         child: Icon(

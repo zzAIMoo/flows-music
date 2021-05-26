@@ -29,7 +29,7 @@ class _BodyState extends State<Body> {
   getUserInfo() async {
     requestStarted = true;
     setState(() {});
-    var url = Uri.parse('https://sechisimone.altervista.org/flows/API/read/get_user_info.php');
+    var url = Uri.parse('http://135.125.44.178/API/read/get_user_info.php');
     var response = await http.post(url, body: {
       'access_token': accessToken,
     });

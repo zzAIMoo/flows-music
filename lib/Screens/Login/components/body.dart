@@ -32,7 +32,8 @@ class _BodyState extends State<Body> {
         refreshToken = prefs.getString("refresh_token");
         print(refreshToken);
         requestStarted = true;
-        var url = Uri.parse('https://sechisimone.altervista.org/flows/API/registration/signin.php');
+        //var url = Uri.parse('https://sechisimone.altervista.org/flows/API/registration/signin.php');
+        var url = Uri.parse('http://135.125.44.178/API/registration/signin.php');
         var response = await http.post(
           url,
           body: {'refresh_token': refreshToken},
@@ -129,7 +130,7 @@ class _BodyState extends State<Body> {
               press: () async {
                 requestStarted = true;
                 setState(() {});
-                var url = Uri.parse('https://sechisimone.altervista.org/flows/API/registration/signin.php');
+                var url = Uri.parse('http://135.125.44.178/API/registration/signin.php');
                 var response = await http.post(url, body: {'email': email, 'password': psw});
                 print('Response status: ${response.statusCode}');
                 print('Response body: ${response.body}');

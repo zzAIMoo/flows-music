@@ -20,11 +20,7 @@ class Body extends StatefulWidget {
 }
 
 class _BodyState extends State<Body> {
-  bool isHidden = true,
-      requestStarted = false,
-      isUsernameValid = true,
-      isEmailValid = true,
-      isPasswordValid = true;
+  bool isHidden = true, requestStarted = false, isUsernameValid = true, isEmailValid = true, isPasswordValid = true;
 
   String username = "", mail = "", psw = "", email = "";
 
@@ -67,9 +63,7 @@ class _BodyState extends State<Body> {
               color: Color(0xFF6F35A5),
               hintText: "Your Email",
               onChanged: (value) {
-                isEmailValid = RegExp(
-                        r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                    .hasMatch(value);
+                isEmailValid = RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(value);
                 email = value;
               },
             ),
@@ -118,27 +112,20 @@ class _BodyState extends State<Body> {
                 }
                 requestStarted = true;
                 setState(() {});
-                var url = Uri.parse(
-                    'https://sechisimone.altervista.org/flows/API/registration/signup.php');
-                var response = await http.post(url, body: {
-                  'email': email,
-                  'username': username,
-                  'password': psw
-                });
+                var url = Uri.parse('http://135.125.44.178//flows/API/registration/signup.php');
+                var response = await http.post(url, body: {'email': email, 'username': username, 'password': psw});
                 print('Response status: ${response.statusCode}');
                 print('Response body: ${response.body}');
                 if (response.statusCode == 200) {
                   var responseParsed = convert.jsonDecode(response.body);
                   print(responseParsed["response_type"]);
                   if (responseParsed["response_type"] == "already_registered") {
-                    showToast(
-                        "Mail/Username già utilizzati in un altro account");
+                    showToast("Mail/Username già utilizzati in un altro account");
                     requestStarted = false;
                     setState(() {});
                     return;
                   } else if (responseParsed["response_type"] == "email_error") {
-                    showToast(
-                        "Ci sono problemi con i server, si è pregati di riprovare più tardi");
+                    showToast("Ci sono problemi con i server, si è pregati di riprovare più tardi");
                     requestStarted = false;
                     setState(() {});
                     return;

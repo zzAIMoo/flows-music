@@ -27,14 +27,18 @@ class _CardScreenState extends State<CardScreen> {
     "https://images.unsplash.com/photo-1613066839141-4489f60e0389?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=634&q=80"
   ];
 
-  String url = 'https://sechisimone.altervista.org/flows/songs/RADICAL__MINACCIA.mp3';
+  //String url = 'https://sechisimone.altervista.org/flows/songs/RADICAL__MINACCIA.mp3';
+  String url = 'http://135.125.44.178/songs/a3b44c0172b8c62e9fc621ecbb72bacf.mp3';
 
-  List<String> urls = ['https://sechisimone.altervista.org/flows/songs/RADICAL__MINACCIA.mp3'];
+  List<String> urls = [
+    'https://sechisimone.altervista.org/flows/songs/RADICAL__MINACCIA.mp3',
+    "http://135.125.44.178/songs/a3b44c0172b8c62e9fc621ecbb72bacf.mp3"
+  ];
 
   @override
   void initState() {
     super.initState();
-    _cardManager = new CardManager(url);
+    _cardManager = new CardManager(urls[0]);
   }
 
   @override
@@ -343,6 +347,7 @@ class _CardScreenState extends State<CardScreen> {
                       still = true;
                       swipeLeft = false;
                       swipeRight = false;
+                      _cardManager.setUrl(urls[currIndex]);
                     });
                   },
                 ),

@@ -44,7 +44,7 @@ class _MyAppState extends State<MyApp> {
       if (prefs.containsKey("refresh_token")) {
         refreshToken = prefs.getString("refresh_token");
         requestStarted = true;
-        var url = Uri.parse('https://sechisimone.altervista.org/flows/API/registration/signin.php');
+        var url = Uri.parse('http://135.125.44.178/API/registration/signin.php');
         var response = await http.post(url, body: {'refresh_token': refreshToken});
         print('Response status: ${response.statusCode}');
         print('Response body: ${response.body}');
