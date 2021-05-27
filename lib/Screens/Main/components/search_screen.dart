@@ -16,11 +16,13 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   ScrollController _scrollController = new ScrollController();
-  bool isPerformingRequest = false, addedShimmer = false, downloadStarted = false;
+  bool isPerformingRequest = false,
+      addedShimmer = false,
+      downloadStarted = false;
   SearchBar searchBar;
   static String key = "AIzaSyBgARzrg0k-ro-BbdTxYfWuwvNtIC6osXA";
 
-  YoutubeAPI ytApi = YoutubeAPI(key, maxResults: 16);
+  YoutubeAPI ytApi = YoutubeAPI(key, maxResults: 16, type: "video");
   List<YT_API> ytResult = [];
 
   AppBar buildAppBar(BuildContext context) {
@@ -75,7 +77,8 @@ class _SearchScreenState extends State<SearchScreen> {
   void initState() {
     super.initState();
     _scrollController.addListener(() {
-      if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 50) {
+      if (_scrollController.position.pixels >=
+          _scrollController.position.maxScrollExtent - 50) {
         _getMoreData();
       }
     });
@@ -143,8 +146,6 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  //Widget shimmerItems(index) {}
-
   Widget listItem(index) {
     return Card(
       child: Container(
@@ -174,17 +175,101 @@ class _SearchScreenState extends State<SearchScreen> {
                       ),
                       !downloadStarted
                           ? MaterialButton(
+                              //trasnformare tutta sta roba usando scrobblenaut wrapper for flutter
                               onPressed: () async {
                                 downloadStarted = true;
-                                var url = Uri.parse('http://135.125.44.178:5000/url?id=' + results[index].id);
-                                var response = await http.get(url);
-                                print('Response status: ${response.statusCode}');
-                                print('Response body: ${response.body}');
-                                if (response.statusCode == 200) {
-                                  print(response);
+                                setState(() {});
+                                List<String> tags = [];
+                                var lastfmUrl = Uri.encodeFull(
+                                    "https://ws.audioscrobbler.com/2.0/?method=artist.gettoptags&artist=" +
+                                        results[index]
+                                            .channelTitle
+                                            .toLowerCase()
+                                            .replaceAll("vevo", "") +
+                                        "&api_key=4d70550343db4aa79b0f2fc6c5a9867b&format=json&autocorrect=1");
+                                print(lastfmUrl);
+                                var responseFM = await http.get(lastfmUrl);
+                                if (responseFM.statusCode == 200) {
+                                  var responseParsed =
+                                      convert.jsonDecode(responseFM.body);
+                                  print(responseParsed);
+                                  if (responseParsed["error"] == 6) {
+                                    downloadStarted = false;
+                                    setState(() {});
+                                    //mettere il download del video
+                                    showToast(
+                                        "Impossibile trovare l'artista, probabilmente il nome del canale contiene un carattere proibito");
+                                    return;
+                                  }
+                                  if (responseParsed["toptags"].length == 2 ||
+                                      responseParsed["error"] == 6) {
+                                    results[index]
+                                        .title
+                                        .split(" -")
+                                        .forEach((element) async {
+                                      print(element);
+                                      var url = Uri.encodeFull(
+                                          "https://ws.audioscrobbler.com/2.0/?method=artist.gettoptags&artist=" +
+                                              element.replaceAll(" ", "+") +
+                                              "&api_key=4d70550343db4aa79b0f2fc6c5a9867b&format=json&autocorrect=1");
+                                      var responseInside = await http.get(url);
+                                      if (responseInside.statusCode == 200) {
+                                        var parsed = convert
+                                            .jsonDecode(responseInside.body);
+                                        print(parsed);
+                                        if (parsed["error"] != 6) {
+                                          parsed["toptags"]["tag"]
+                                              .forEach((element) {
+                                            if (element["count"] >= 70) {
+                                              tags.add(element["name"]);
+                                            }
+                                          });
+                                        }
+                                      }
+                                      print(tags);
+                                      downloadStarted = false;
+                                      setState(() {});
+                                    });
+                                  } else {
+                                    responseParsed["toptags"]["tag"]
+                                        .forEach((element) {
+                                      if (element["count"] >= 70) {
+                                        tags.add(element["name"]);
+                                      }
+                                    });
+                                    print(tags);
+                                    downloadStarted = false;
+                                  }
+                                }
+
+/*
+                                var downloadUrl = Uri.parse(
+                                    'http://135.125.44.178:5000/url?id=' +
+                                        results[index].id);
+                                var responseDownload =
+                                    await http.get(downloadUrl);
+                                print(
+                                    'Response status: ${responseDownload.statusCode}');
+                                print(
+                                    'Response body: ${responseDownload.body}');
+                                if (responseDownload.statusCode == 200) {
+                                  print(responseDownload);
                                   downloadStarted = false;
                                   //results[index].id
                                 }
+
+                                var addSongUrl = Uri.parse(
+                                    "http://135.125.44.178/API/create/add_song.php");
+                                var responseAddSong =
+                                    await http.get(addSongUrl);
+                                print(
+                                    'Response status: ${responseAddSong.statusCode}');
+                                print('Response body: ${responseAddSong.body}');
+                                if (responseAddSong.statusCode == 200) {
+                                  print(responseAddSong);
+                                  downloadStarted = false;
+                                  //results[index].id
+                                }*/
                               },
                               color: Color(0xFF6F35A5),
                               textColor: Colors.white,
@@ -196,6 +281,7 @@ class _SearchScreenState extends State<SearchScreen> {
                             )
                           : Center(
                               child: Container(
+                                padding: EdgeInsets.only(left: 15),
                                 child: LoadingRotating.square(
                                   size: 10.0,
                                   borderColor: Color(0xFF6F35A5),

@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'components/search_screen.dart';
 import 'components/card_screen.dart';
 import 'components/library_screen.dart';
+import 'components/card_manager.dart';
 import 'package:flows/Screens/Settings/settings_screen.dart';
+import 'package:miniplayer/miniplayer.dart';
 //import 'package:image/image.dart' as IMG;
 
 void main() {}
@@ -29,9 +31,17 @@ class MainScreenPage extends StatefulWidget {
 }
 
 class _MainScreenPageState extends State<MainScreenPage> {
+  CardManager _cardManager;
+  List<String> urls = [
+    'https://sechisimone.altervista.org/flows/songs/RADICAL__MINACCIA.mp3',
+    "http://135.125.44.178/songs/a3b44c0172b8c62e9fc621ecbb72bacf.mp3",
+    "http://135.125.44.178/songs/77f793ad27389e97f5b32e2103b8da7e.mp3"
+  ];
+
   @override
   void initState() {
     super.initState();
+    _cardManager = new CardManager(urls[0]);
   }
 
   List<Widget> buildPage(BuildContext context) {
@@ -95,8 +105,21 @@ class _MainScreenPageState extends State<MainScreenPage> {
                       title: Text('Library'),
                     )
                   : null,
-      body: Center(
-        child: buildPage(context).elementAt(_selectedIndex),
+      body: Stack(
+        children: [
+          Center(
+            child: buildPage(context).elementAt(_selectedIndex),
+          ),
+          Miniplayer(
+            minHeight: 70,
+            maxHeight: MediaQuery.of(context).size.height - 141,
+            builder: (height, percentage) {
+              return Center(
+                child: Text('$height, $percentage'),
+              );
+            },
+          ),
+        ],
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[

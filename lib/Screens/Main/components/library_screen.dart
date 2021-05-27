@@ -125,7 +125,8 @@ class _LibraryScreenState extends State<LibraryScreen> {
   receivePlaylists() async {
     requestStarted = true;
     setState(() {});
-    var url = Uri.parse('http://135.125.44.178/read/get_user_playlists.php');
+    var url =
+        Uri.parse('http://135.125.44.178/API/read/get_user_playlists.php');
     var response = await http.post(url, body: {
       'access_token': accessToken,
     });
@@ -175,7 +176,8 @@ class _LibraryScreenState extends State<LibraryScreen> {
           print(element);
         });
         SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setString('access_token', responseParsed["response_body"]["access_token"].toString());
+        prefs.setString('access_token',
+            responseParsed["response_body"]["access_token"].toString());
         requestStarted = false;
         setState(() {});
         return;
@@ -183,23 +185,28 @@ class _LibraryScreenState extends State<LibraryScreen> {
         print(responseParsed);
         showToast("C'è stato un errore nella ricezione delle tue playlists");
         SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setString('access_token', responseParsed["response_body"]["access_token"].toString());
+        prefs.setString('access_token',
+            responseParsed["response_body"]["access_token"].toString());
         requestStarted = false;
         setState(() {});
         return;
       } else if (responseParsed["response_type"] == "access_token_expired") {
-        var url = Uri.parse('http://135.125.44.178/API/OAuth/get_access_token.php');
+        var url =
+            Uri.parse('http://135.125.44.178/API/OAuth/get_access_token.php');
         var response = await http.post(url, body: {
           'refresh_token': refreshToken,
         });
         if (response.statusCode == 200) {
           print(response.body);
           var responseParsed = convert.jsonDecode(response.body);
-          if (responseParsed["response_type"] == "access_token_created_correctly") {
+          if (responseParsed["response_type"] ==
+              "access_token_created_correctly") {
             SharedPreferences prefs = await SharedPreferences.getInstance();
-            await prefs.setString('access_token', responseParsed["response_body"]["access_token"]);
+            await prefs.setString('access_token',
+                responseParsed["response_body"]["access_token"]);
             receivePlaylists();
-          } else if (responseParsed["response_type"] == "refresh_token_expired") {
+          } else if (responseParsed["response_type"] ==
+              "refresh_token_expired") {
             showToast("Token Expired, logging out of the account");
             SharedPreferences prefs = await SharedPreferences.getInstance();
             prefs.clear();
@@ -233,29 +240,35 @@ class _LibraryScreenState extends State<LibraryScreen> {
       if (responseParsed["response_type"] == "playlist_added") {
         showToast("Playlist creata correttamente con il nome " + playlistName);
         SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setString('access_token', responseParsed["response_body"]["access_token"].toString());
+        await prefs.setString('access_token',
+            responseParsed["response_body"]["access_token"].toString());
         requestStarted = false;
         setState(() {});
         return;
       } else if (responseParsed["response_type"] == "error_in_adding") {
         showToast("C'è stato un errore nella creazione della playlist");
         SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setString('access_token', responseParsed["response_body"]["access_token"].toString());
+        await prefs.setString('access_token',
+            responseParsed["response_body"]["access_token"].toString());
         requestStarted = false;
         setState(() {});
         return;
       } else if (responseParsed["response_type"] == "access_token_expired") {
-        var url = Uri.parse('http://135.125.44.178/API/OAuth/get_access_token.php');
+        var url =
+            Uri.parse('http://135.125.44.178/API/OAuth/get_access_token.php');
         var response = await http.post(url, body: {
           'refresh_token': refreshToken,
         });
         if (response.statusCode == 200) {
           var responseParsed = convert.jsonDecode(response.body);
-          if (responseParsed["response_type"] == "access_token_created_correctly") {
+          if (responseParsed["response_type"] ==
+              "access_token_created_correctly") {
             SharedPreferences prefs = await SharedPreferences.getInstance();
-            await prefs.setString('access_token', responseParsed["response_body"]["access_token"]);
+            await prefs.setString('access_token',
+                responseParsed["response_body"]["access_token"]);
             createPlaylist(playlistName);
-          } else if (responseParsed["response_type"] == "refresh_token_expired") {
+          } else if (responseParsed["response_type"] ==
+              "refresh_token_expired") {
             showToast("Token Expired, logging out of the account");
             SharedPreferences prefs = await SharedPreferences.getInstance();
             prefs.clear();
@@ -275,7 +288,9 @@ class _LibraryScreenState extends State<LibraryScreen> {
 
   String generateRandomString(int len) {
     var r = Random();
-    const _chars = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
-    return List.generate(len, (index) => _chars[r.nextInt(_chars.length)]).join();
+    const _chars =
+        'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
+    return List.generate(len, (index) => _chars[r.nextInt(_chars.length)])
+        .join();
   }
 }
