@@ -16,9 +16,7 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   ScrollController _scrollController = new ScrollController();
-  bool isPerformingRequest = false,
-      addedShimmer = false,
-      downloadStarted = false;
+  bool isPerformingRequest = false, addedShimmer = false, downloadStarted = false;
   SearchBar searchBar;
   static String key = "AIzaSyBgARzrg0k-ro-BbdTxYfWuwvNtIC6osXA";
 
@@ -28,6 +26,7 @@ class _SearchScreenState extends State<SearchScreen> {
   AppBar buildAppBar(BuildContext context) {
     return new AppBar(
       title: new Text('Cerca un media'),
+      backgroundColor: Color(0xFF6F35A5),
       actions: [searchBar.getSearchAction(context)],
       textTheme: TextTheme(
         headline6: TextStyle(
@@ -77,8 +76,7 @@ class _SearchScreenState extends State<SearchScreen> {
   void initState() {
     super.initState();
     _scrollController.addListener(() {
-      if (_scrollController.position.pixels >=
-          _scrollController.position.maxScrollExtent - 50) {
+      if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 50) {
         _getMoreData();
       }
     });
@@ -180,18 +178,13 @@ class _SearchScreenState extends State<SearchScreen> {
                                 downloadStarted = true;
                                 setState(() {});
                                 List<String> tags = [];
-                                var lastfmUrl = Uri.encodeFull(
-                                    "https://ws.audioscrobbler.com/2.0/?method=artist.gettoptags&artist=" +
-                                        results[index]
-                                            .channelTitle
-                                            .toLowerCase()
-                                            .replaceAll("vevo", "") +
-                                        "&api_key=4d70550343db4aa79b0f2fc6c5a9867b&format=json&autocorrect=1");
+                                var lastfmUrl = Uri.encodeFull("https://ws.audioscrobbler.com/2.0/?method=artist.gettoptags&artist=" +
+                                    results[index].channelTitle.toLowerCase().replaceAll("vevo", "") +
+                                    "&api_key=4d70550343db4aa79b0f2fc6c5a9867b&format=json&autocorrect=1");
                                 print(lastfmUrl);
                                 var responseFM = await http.get(lastfmUrl);
                                 if (responseFM.statusCode == 200) {
-                                  var responseParsed =
-                                      convert.jsonDecode(responseFM.body);
+                                  var responseParsed = convert.jsonDecode(responseFM.body);
                                   print(responseParsed);
                                   if (responseParsed["error"] == 6) {
                                     downloadStarted = false;
@@ -201,25 +194,18 @@ class _SearchScreenState extends State<SearchScreen> {
                                         "Impossibile trovare l'artista, probabilmente il nome del canale contiene un carattere proibito");
                                     return;
                                   }
-                                  if (responseParsed["toptags"].length == 2 ||
-                                      responseParsed["error"] == 6) {
-                                    results[index]
-                                        .title
-                                        .split(" -")
-                                        .forEach((element) async {
+                                  if (responseParsed["toptags"].length == 2 || responseParsed["error"] == 6) {
+                                    results[index].title.split(" -").forEach((element) async {
                                       print(element);
-                                      var url = Uri.encodeFull(
-                                          "https://ws.audioscrobbler.com/2.0/?method=artist.gettoptags&artist=" +
-                                              element.replaceAll(" ", "+") +
-                                              "&api_key=4d70550343db4aa79b0f2fc6c5a9867b&format=json&autocorrect=1");
+                                      var url = Uri.encodeFull("https://ws.audioscrobbler.com/2.0/?method=artist.gettoptags&artist=" +
+                                          element.replaceAll(" ", "+") +
+                                          "&api_key=4d70550343db4aa79b0f2fc6c5a9867b&format=json&autocorrect=1");
                                       var responseInside = await http.get(url);
                                       if (responseInside.statusCode == 200) {
-                                        var parsed = convert
-                                            .jsonDecode(responseInside.body);
+                                        var parsed = convert.jsonDecode(responseInside.body);
                                         print(parsed);
                                         if (parsed["error"] != 6) {
-                                          parsed["toptags"]["tag"]
-                                              .forEach((element) {
+                                          parsed["toptags"]["tag"].forEach((element) {
                                             if (element["count"] >= 70) {
                                               tags.add(element["name"]);
                                             }
@@ -231,8 +217,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                       setState(() {});
                                     });
                                   } else {
-                                    responseParsed["toptags"]["tag"]
-                                        .forEach((element) {
+                                    responseParsed["toptags"]["tag"].forEach((element) {
                                       if (element["count"] >= 70) {
                                         tags.add(element["name"]);
                                       }

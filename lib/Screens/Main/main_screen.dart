@@ -66,6 +66,7 @@ class _MainScreenPageState extends State<MainScreenPage> {
           ? null
           : _selectedIndex == 0
               ? AppBar(
+                  backgroundColor: Color(0xFF6F35A5),
                   actions: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
@@ -75,8 +76,7 @@ class _MainScreenPageState extends State<MainScreenPage> {
                             onPressed: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(
-                                    builder: (context) => SettingsScreen()),
+                                MaterialPageRoute(builder: (context) => SettingsScreen()),
                               );
                             }),
                       ],
@@ -86,6 +86,7 @@ class _MainScreenPageState extends State<MainScreenPage> {
                 )
               : _selectedIndex == 2
                   ? AppBar(
+                      backgroundColor: Color(0xFF6F35A5),
                       actions: [
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
@@ -95,8 +96,7 @@ class _MainScreenPageState extends State<MainScreenPage> {
                                 onPressed: () {
                                   Navigator.push(
                                     context,
-                                    MaterialPageRoute(
-                                        builder: (context) => SettingsScreen()),
+                                    MaterialPageRoute(builder: (context) => SettingsScreen()),
                                   );
                                 }),
                           ],
@@ -112,7 +112,7 @@ class _MainScreenPageState extends State<MainScreenPage> {
           ),
           Miniplayer(
             minHeight: 70,
-            maxHeight: MediaQuery.of(context).size.height - 141,
+            maxHeight: MediaQuery.of(context).size.height - 137,
             builder: (height, percentage) {
               return Center(
                 child: Text('$height, $percentage'),
@@ -137,7 +137,7 @@ class _MainScreenPageState extends State<MainScreenPage> {
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.purple[800],
+        selectedItemColor: Color(0xFF6F35A5),
         onTap: _onItemTapped,
       ),
     );

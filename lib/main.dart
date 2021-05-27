@@ -28,7 +28,6 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Auth',
       theme: ThemeData(
         highlightColor: Color(0xFF6F35A5),
         focusColor: Color(0xFF6F35A5),
