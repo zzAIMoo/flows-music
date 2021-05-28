@@ -76,7 +76,8 @@ class _MainScreenPageState extends State<MainScreenPage> {
                             onPressed: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => SettingsScreen()),
+                                MaterialPageRoute(
+                                    builder: (context) => SettingsScreen()),
                               );
                             }),
                       ],
@@ -96,7 +97,8 @@ class _MainScreenPageState extends State<MainScreenPage> {
                                 onPressed: () {
                                   Navigator.push(
                                     context,
-                                    MaterialPageRoute(builder: (context) => SettingsScreen()),
+                                    MaterialPageRoute(
+                                        builder: (context) => SettingsScreen()),
                                   );
                                 }),
                           ],
@@ -112,10 +114,38 @@ class _MainScreenPageState extends State<MainScreenPage> {
           ),
           Miniplayer(
             minHeight: 70,
-            maxHeight: MediaQuery.of(context).size.height - 137,
+            backgroundColor: Colors.transparent,
+            maxHeight: 70,
             builder: (height, percentage) {
               return Center(
-                child: Text('$height, $percentage'),
+                child: ValueListenableBuilder<ButtonState>(
+                  valueListenable: _cardManager.buttonNotifier,
+                  builder: (_, value, __) {
+                    switch (value) {
+                      case ButtonState.loading:
+                        return Container(
+                          margin: EdgeInsets.all(8.0),
+                          width: 32.0,
+                          height: 32.0,
+                          child: CircularProgressIndicator(),
+                        );
+                      case ButtonState.paused:
+                        return IconButton(
+                          icon: Icon(Icons.play_arrow),
+                          iconSize: 32.0,
+                          onPressed: _cardManager.play,
+                        );
+                      case ButtonState.playing:
+                        return IconButton(
+                          icon: Icon(Icons.pause),
+                          iconSize: 32.0,
+                          onPressed: _cardManager.pause,
+                        );
+                      default:
+                        return Container();
+                    }
+                  },
+                ),
               );
             },
           ),

@@ -29,6 +29,9 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
+        appBarTheme: AppBarTheme(
+          color: Color(0xFF6F35A5),
+        ),
         highlightColor: Color(0xFF6F35A5),
         focusColor: Color(0xFF6F35A5),
         primaryColor: Color(0xFF6F35A5),
@@ -43,15 +46,18 @@ class _MyAppState extends State<MyApp> {
       if (prefs.containsKey("refresh_token")) {
         refreshToken = prefs.getString("refresh_token");
         requestStarted = true;
-        var url = Uri.parse('http://135.125.44.178/API/registration/signin.php');
-        var response = await http.post(url, body: {'refresh_token': refreshToken});
+        var url =
+            Uri.parse('https://api.flowsmusic.it/registration/signin.php');
+        var response =
+            await http.post(url, body: {'refresh_token': refreshToken});
         print('Response status: ${response.statusCode}');
         print('Response body: ${response.body}');
         if (response.statusCode == 200) {
           var responseParsed = convert.jsonDecode(response.body);
           if (responseParsed["response_type"] == "loggedin_correctly") {
             SharedPreferences prefs = await SharedPreferences.getInstance();
-            prefs.setString('access_token', responseParsed["response_body"]["access_token"]);
+            prefs.setString('access_token',
+                responseParsed["response_body"]["access_token"]);
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => MainScreen()),

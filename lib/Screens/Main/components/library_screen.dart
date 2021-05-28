@@ -126,7 +126,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
     requestStarted = true;
     setState(() {});
     var url =
-        Uri.parse('http://135.125.44.178/API/read/get_user_playlists.php');
+        Uri.parse('https://api.flowsmusic.it/read/get_user_playlists.php');
     var response = await http.post(url, body: {
       'access_token': accessToken,
     });
@@ -192,7 +192,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
         return;
       } else if (responseParsed["response_type"] == "access_token_expired") {
         var url =
-            Uri.parse('http://135.125.44.178/API/OAuth/get_access_token.php');
+            Uri.parse('https://api.flowsmusic.it/OAuth/get_access_token.php');
         var response = await http.post(url, body: {
           'refresh_token': refreshToken,
         });
@@ -227,7 +227,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
   createPlaylist(playlistName) async {
     requestStarted = true;
     setState(() {});
-    var url = Uri.parse('http://135.125.44.178/API/create/add_playlist.php');
+    var url = Uri.parse('https://api.flowsmusic.it/create/add_playlist.php');
     var response = await http.post(url, body: {
       'name': playlistName,
       'description': "descrizione",
@@ -255,7 +255,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
         return;
       } else if (responseParsed["response_type"] == "access_token_expired") {
         var url =
-            Uri.parse('http://135.125.44.178/API/OAuth/get_access_token.php');
+            Uri.parse('https://api.flowsmusic.it/OAuth/get_access_token.php');
         var response = await http.post(url, body: {
           'refresh_token': refreshToken,
         });

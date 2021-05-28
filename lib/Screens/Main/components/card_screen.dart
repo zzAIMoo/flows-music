@@ -12,7 +12,10 @@ class CardScreen extends StatefulWidget {
 class _CardScreenState extends State<CardScreen> {
   CardManager _cardManager;
   int currIndex = 0;
-  bool swipeLeft = false, swipeRight = false, still = true, requestStarted = false;
+  bool swipeLeft = false,
+      swipeRight = false,
+      still = true,
+      requestStarted = false;
   double gradValue = 1.0;
   CardController controller;
 
@@ -28,10 +31,10 @@ class _CardScreenState extends State<CardScreen> {
   ];
 
   //String url = 'https://sechisimone.altervista.org/flows/songs/RADICAL__MINACCIA.mp3';
-  String url = 'http://135.125.44.178/songs/a3b44c0172b8c62e9fc621ecbb72bacf.mp3';
+  String url =
+      'http://135.125.44.178/songs/a3b44c0172b8c62e9fc621ecbb72bacf.mp3';
 
   List<String> urls = [
-    'https://sechisimone.altervista.org/flows/songs/RADICAL__MINACCIA.mp3',
     "http://135.125.44.178/songs/a3b44c0172b8c62e9fc621ecbb72bacf.mp3",
     "http://135.125.44.178/songs/77f793ad27389e97f5b32e2103b8da7e.mp3"
   ];
@@ -68,7 +71,9 @@ class _CardScreenState extends State<CardScreen> {
                   minWidth: MediaQuery.of(context).size.width * 0.8,
                   minHeight: MediaQuery.of(context).size.width * 0.8,
                   //qua dovrò cambiare tutte le cose con le liste, quindi urls, progress e tutto
-                  cardBuilder: (context, index) => !swipeLeft && !swipeRight && index == currIndex
+                  cardBuilder: (context, index) => !swipeLeft &&
+                          !swipeRight &&
+                          index == currIndex
                       ? Card(
                           child: new Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
@@ -81,14 +86,18 @@ class _CardScreenState extends State<CardScreen> {
                                   shape: BoxShape.circle,
                                   image: new DecorationImage(
                                     fit: BoxFit.fill,
-                                    image: new NetworkImage('${songImages[index]}'),
+                                    image: FadeInImage.assetNetwork(
+                                      placeholder: 'assets/loading_gif.gif',
+                                      image: '${songImages[index]}',
+                                    ).image,
                                   ),
                                 ),
                               ),
                               SizedBox(
                                 width: 300,
                                 child: ValueListenableBuilder<ProgressBarState>(
-                                  valueListenable: _cardManager.progressNotifier,
+                                  valueListenable:
+                                      _cardManager.progressNotifier,
                                   builder: (_, value, __) {
                                     return ProgressBar(
                                       onSeek: _cardManager.seek,
@@ -143,7 +152,10 @@ class _CardScreenState extends State<CardScreen> {
                                       shape: BoxShape.circle,
                                       image: new DecorationImage(
                                         fit: BoxFit.fill,
-                                        image: new NetworkImage('${songImages[index]}'),
+                                        image: FadeInImage.assetNetwork(
+                                          placeholder: 'assets/loading_gif.gif',
+                                          image: '${songImages[index]}',
+                                        ).image,
                                       ),
                                     ),
                                   ),
@@ -179,8 +191,10 @@ class _CardScreenState extends State<CardScreen> {
                                   },
                                   child: Card(
                                     child: new Column(
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: <Widget>[
                                         Container(
                                           width: 150.0,
@@ -189,14 +203,20 @@ class _CardScreenState extends State<CardScreen> {
                                             shape: BoxShape.circle,
                                             image: new DecorationImage(
                                               fit: BoxFit.fill,
-                                              image: new NetworkImage('${songImages[index]}'),
+                                              image: FadeInImage.assetNetwork(
+                                                placeholder:
+                                                    'assets/loading_gif.gif',
+                                                image: '${songImages[index]}',
+                                              ).image,
                                             ),
                                           ),
                                         ),
                                         SizedBox(
                                           width: 300,
-                                          child: ValueListenableBuilder<ProgressBarState>(
-                                            valueListenable: _cardManager.progressNotifier,
+                                          child: ValueListenableBuilder<
+                                              ProgressBarState>(
+                                            valueListenable:
+                                                _cardManager.progressNotifier,
                                             builder: (_, value, __) {
                                               return ProgressBar(
                                                 onSeek: _cardManager.seek,
@@ -208,7 +228,8 @@ class _CardScreenState extends State<CardScreen> {
                                           ),
                                         ),
                                         ValueListenableBuilder<ButtonState>(
-                                          valueListenable: _cardManager.buttonNotifier,
+                                          valueListenable:
+                                              _cardManager.buttonNotifier,
                                           builder: (_, value, __) {
                                             switch (value) {
                                               case ButtonState.loading:
@@ -216,7 +237,8 @@ class _CardScreenState extends State<CardScreen> {
                                                   margin: EdgeInsets.all(8.0),
                                                   width: 32.0,
                                                   height: 32.0,
-                                                  child: CircularProgressIndicator(),
+                                                  child:
+                                                      CircularProgressIndicator(),
                                                 );
                                               case ButtonState.paused:
                                                 return IconButton(
@@ -254,8 +276,10 @@ class _CardScreenState extends State<CardScreen> {
                                   },
                                   child: Card(
                                     child: new Column(
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: <Widget>[
                                         Container(
                                           width: 150.0,
@@ -264,14 +288,20 @@ class _CardScreenState extends State<CardScreen> {
                                             shape: BoxShape.circle,
                                             image: new DecorationImage(
                                               fit: BoxFit.fill,
-                                              image: new NetworkImage('${songImages[index]}'),
+                                              image: FadeInImage.assetNetwork(
+                                                placeholder:
+                                                    'assets/loading_gif.gif',
+                                                image: '${songImages[index]}',
+                                              ).image,
                                             ),
                                           ),
                                         ),
                                         SizedBox(
                                           width: 300,
-                                          child: ValueListenableBuilder<ProgressBarState>(
-                                            valueListenable: _cardManager.progressNotifier,
+                                          child: ValueListenableBuilder<
+                                              ProgressBarState>(
+                                            valueListenable:
+                                                _cardManager.progressNotifier,
                                             builder: (_, value, __) {
                                               return ProgressBar(
                                                 onSeek: _cardManager.seek,
@@ -283,7 +313,8 @@ class _CardScreenState extends State<CardScreen> {
                                           ),
                                         ),
                                         ValueListenableBuilder<ButtonState>(
-                                          valueListenable: _cardManager.buttonNotifier,
+                                          valueListenable:
+                                              _cardManager.buttonNotifier,
                                           builder: (_, value, __) {
                                             switch (value) {
                                               case ButtonState.loading:
@@ -291,7 +322,8 @@ class _CardScreenState extends State<CardScreen> {
                                                   margin: EdgeInsets.all(8.0),
                                                   width: 32.0,
                                                   height: 32.0,
-                                                  child: CircularProgressIndicator(),
+                                                  child:
+                                                      CircularProgressIndicator(),
                                                 );
                                               case ButtonState.paused:
                                                 return IconButton(
@@ -315,7 +347,8 @@ class _CardScreenState extends State<CardScreen> {
                                   ),
                                 ),
                   cardController: controller = CardController(),
-                  swipeUpdateCallback: (DragUpdateDetails details, Alignment align) {
+                  swipeUpdateCallback:
+                      (DragUpdateDetails details, Alignment align) {
                     /// Get swiping card's alignment
                     gradValue = (align.x / 10).abs();
                     if (align.x < -1.5) {
@@ -340,9 +373,11 @@ class _CardScreenState extends State<CardScreen> {
                       });
                     }
                   },
-                  swipeCompleteCallback: (CardSwipeOrientation orientation, int index) {
+                  swipeCompleteCallback:
+                      (CardSwipeOrientation orientation, int index) {
                     setState(() {
-                      if (orientation == CardSwipeOrientation.RIGHT || orientation == CardSwipeOrientation.LEFT) {
+                      if (orientation == CardSwipeOrientation.RIGHT ||
+                          orientation == CardSwipeOrientation.LEFT) {
                         currIndex++;
                       }
                       still = true;
