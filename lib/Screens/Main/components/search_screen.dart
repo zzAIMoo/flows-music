@@ -1,4 +1,5 @@
 import 'package:flows/Screens/Login/login_screen.dart';
+import 'package:flows/Screens/Main/components/card_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:youtube_api/youtube_api.dart';
@@ -25,9 +26,11 @@ class _SearchScreenState extends State<SearchScreen> {
   SearchBar searchBar;
   static String key = "AIzaSyBgARzrg0k-ro-BbdTxYfWuwvNtIC6osXA";
   String accessToken = "", refreshToken = "";
+  CardManager _cardManager;
 
   YoutubeAPI ytApi = YoutubeAPI(key, maxResults: 16, type: "video");
   List<YT_API> ytResult = [];
+  List<bool> doesItExist = [];
 
   void doStuff() async {
     await getSharedPrefs();
@@ -73,6 +76,7 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   void onSubmitted(String value) async {
+    doesItExist = [];
     if (!isPerformingRequest) {
       setState(() {
         _scrollController.jumpTo(0);
@@ -83,10 +87,17 @@ class _SearchScreenState extends State<SearchScreen> {
         showToast(
             "Non esistono video con questo argomento di ricerca, se non trovi una canzone prova ad aggiungere \"Topic\" ai termini di ricerca");
       }
-      setState(() {
-        isPerformingRequest = false;
-        results = newResults;
+      isPerformingRequest = false;
+      results = newResults;
+      int i = 0;
+      results.forEach((element) async {
+        doesItExist.add(await songExists(i));
+        i++;
       });
+      print("esiste: \n\n\n\n");
+      print(doesItExist);
+      print("esiste: \n\n\n\n");
+      setState(() {});
     }
   }
 
@@ -100,11 +111,14 @@ class _SearchScreenState extends State<SearchScreen> {
       }
     });
     doStuff();
+    _cardManager = new CardManager(
+        "http://135.125.44.178/songs/a3b44c0172b8c62e9fc621ecbb72bacf.mp3");
   }
 
   @override
   void dispose() {
     _scrollController.dispose();
+    _cardManager.dispose();
     super.dispose();
   }
 
@@ -121,6 +135,12 @@ class _SearchScreenState extends State<SearchScreen> {
       setState(() {
         isPerformingRequest = false;
         results.addAll(newEntries);
+        int i = 0;
+        results.forEach((element) {
+          songExists(i);
+          i++;
+        });
+        print(doesItExist);
       });
     }
   }
@@ -193,28 +213,58 @@ class _SearchScreenState extends State<SearchScreen> {
                           style: TextStyle(fontSize: 14.0),
                         ),
                       ),
-                      !downloadStarted
-                          ? MaterialButton(
-                              //trasnformare tutta sta roba usando scrobblenaut wrapper for flutter
-                              onPressed: () => addSong(index),
-                              color: Color(0xFF6F35A5),
-                              textColor: Colors.white,
-                              child: Icon(
-                                Icons.file_download,
-                                size: 16,
-                              ),
-                              shape: CircleBorder(),
-                            )
-                          : Center(
-                              child: Container(
-                                padding: EdgeInsets.only(left: 15),
-                                child: LoadingRotating.square(
-                                  size: 10.0,
-                                  borderColor: Color(0xFF6F35A5),
-                                  backgroundColor: Color(0xFF6F35A5),
+                      doesItExist.length == 0
+                          ? Container()
+                          : !doesItExist[index]
+                              ? !downloadStarted
+                                  ? MaterialButton(
+                                      onPressed: () => addSong(index),
+                                      color: Color(0xFF6F35A5),
+                                      textColor: Colors.white,
+                                      child: Icon(
+                                        Icons.file_download,
+                                        size: 16,
+                                      ),
+                                      shape: CircleBorder(),
+                                    )
+                                  : Center(
+                                      child: Container(
+                                        padding: EdgeInsets.only(left: 15),
+                                        child: LoadingRotating.square(
+                                          size: 10.0,
+                                          borderColor: Color(0xFF6F35A5),
+                                          backgroundColor: Color(0xFF6F35A5),
+                                        ),
+                                      ),
+                                    )
+                              : ValueListenableBuilder<ButtonState>(
+                                  valueListenable: _cardManager.buttonNotifier,
+                                  builder: (_, value, __) {
+                                    switch (value) {
+                                      case ButtonState.loading:
+                                        return Container(
+                                          margin: EdgeInsets.all(8.0),
+                                          width: 32.0,
+                                          height: 32.0,
+                                          child: CircularProgressIndicator(),
+                                        );
+                                      case ButtonState.paused:
+                                        return IconButton(
+                                          icon: Icon(Icons.play_arrow),
+                                          iconSize: 32.0,
+                                          onPressed: _cardManager.play,
+                                        );
+                                      case ButtonState.playing:
+                                        return IconButton(
+                                          icon: Icon(Icons.pause),
+                                          iconSize: 32.0,
+                                          onPressed: _cardManager.pause,
+                                        );
+                                      default:
+                                        return Container();
+                                    }
+                                  },
                                 ),
-                              ),
-                            ),
                     ],
                   ),
                   Padding(padding: EdgeInsets.only(bottom: 1.5)),
@@ -237,6 +287,68 @@ class _SearchScreenState extends State<SearchScreen> {
         ),
       ),
     );
+  }
+
+  Future<bool> songExists(int index) async {
+    var checkSongUrl =
+        Uri.parse("https://api.flowsmusic.it/read/check_song.php");
+    var responseCheckSong = await http.post(
+      checkSongUrl,
+      body: {
+        "access_token": accessToken,
+        "song_file_name":
+            md5.convert(convert.utf8.encode(results[index].id)).toString(),
+      },
+    );
+    if (responseCheckSong.statusCode == 200) {
+      print(responseCheckSong.body);
+      var parsedCheckSong = convert.jsonDecode(responseCheckSong.body);
+      if (parsedCheckSong["response_type"] == "song_exists") {
+        _cardManager.setUrl("http://135.125.44.178/songs/" +
+            md5.convert(convert.utf8.encode(results[index].id)).toString() +
+            ".mp3");
+        print(doesItExist);
+        doesItExist.add(true);
+        return true;
+      } else if (parsedCheckSong["response_type"] == "song_not_exists") {
+        print(doesItExist);
+        doesItExist.add(false);
+        return false;
+      } else if (parsedCheckSong["response_type"] == "access_token_expired") {
+        var url =
+            Uri.parse('https://api.flowsmusic.it/OAuth/get_access_token.php');
+        var response = await http.post(url, body: {
+          'refresh_token': refreshToken,
+        });
+        if (response.statusCode == 200) {
+          var responseParsed = convert.jsonDecode(response.body);
+          if (responseParsed["response_type"] ==
+              "access_token_created_correctly") {
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            await prefs.setString('access_token',
+                responseParsed["response_body"]["access_token"]);
+            songExists(index);
+          } else if (responseParsed["response_type"] ==
+              "refresh_token_expired") {
+            showToast("Token Expired, logging out of the account");
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            prefs.clear();
+            downloadStarted = false;
+            setState(() {});
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => LoginScreen(),
+              ),
+            );
+            return false;
+          }
+        }
+        return false;
+      }
+      return false;
+    }
+    return false;
   }
 
   addSong(int index) async {
@@ -279,20 +391,18 @@ class _SearchScreenState extends State<SearchScreen> {
               });
             }
           }
-          print(tags);
           String tagsForRequest = "";
           tags.forEach((element) {
             tagsForRequest += element.toString() + " ";
           });
           var addSongUrl =
               Uri.parse("https://api.flowsmusic.it/create/add_song.php");
-          print(tagsForRequest);
           var responseAddSong = await http.post(
             addSongUrl,
             body: {
               "access_token": accessToken,
               "song_file_name": md5
-                  .convert(convert.utf8.encode(results[index].title))
+                  .convert(convert.utf8.encode(results[index].id))
                   .toString(),
               "song_name": results[index].title,
               "artist_name": artistName,
@@ -305,16 +415,31 @@ class _SearchScreenState extends State<SearchScreen> {
             if (parsedAddSong["response_type"] == "song_added") {
               SharedPreferences prefs = await SharedPreferences.getInstance();
               prefs.setString('access_token',
-                  responseParsed["response_body"]["access_token"].toString());
+                  parsedAddSong["response_body"]["access_token"].toString());
               downloadStarted = false;
+              print(parsedAddSong);
               setState(() {});
               return;
-            } else if (parsedAddSong["response_type"] == "error_in_adding") {
-              showToast("C'è stato un errore nel download della canzone");
+            } else if (parsedAddSong["response_type"] ==
+                "artist_already_exists") {
+              showToast(
+                  "L'artista già esiste, come hai datto ad ottenere questo errore");
               SharedPreferences prefs = await SharedPreferences.getInstance();
               prefs.setString('access_token',
-                  responseParsed["response_body"]["access_token"].toString());
+                  parsedAddSong["response_body"]["access_token"].toString());
               downloadStarted = false;
+              print(parsedAddSong);
+              setState(() {});
+              return;
+            } else if (parsedAddSong["response_type"] ==
+                "song_already_exists") {
+              downloadStarted = false;
+              showToast(
+                  "La canzone già esiste sul database, come hai fatto ad ottenere questo errore");
+              SharedPreferences prefs = await SharedPreferences.getInstance();
+              prefs.setString('access_token',
+                  parsedAddSong["response_body"]["access_token"].toString());
+              print(parsedAddSong);
               setState(() {});
               return;
             } else if (parsedAddSong["response_type"] ==
@@ -350,7 +475,6 @@ class _SearchScreenState extends State<SearchScreen> {
                 }
               }
             }
-            downloadStarted = false;
           }
           downloadStarted = false;
           setState(() {});
@@ -429,6 +553,72 @@ class _SearchScreenState extends State<SearchScreen> {
                     builder: (context) => LoginScreen(),
                   ),
                 );
+              }
+            }
+            if (responseAddSong.statusCode == 200) {
+              var parsedAddSong = convert.jsonDecode(responseAddSong.body);
+              if (parsedAddSong["response_type"] == "song_added") {
+                SharedPreferences prefs = await SharedPreferences.getInstance();
+                prefs.setString('access_token',
+                    parsedAddSong["response_body"]["access_token"].toString());
+                downloadStarted = false;
+                print(parsedAddSong);
+                setState(() {});
+                return;
+              } else if (parsedAddSong["response_type"] ==
+                  "artist_already_exists") {
+                showToast(
+                    "L'artista già esiste, come hai datto ad ottenere questo errore");
+                SharedPreferences prefs = await SharedPreferences.getInstance();
+                prefs.setString('access_token',
+                    parsedAddSong["response_body"]["access_token"].toString());
+                downloadStarted = false;
+                print(parsedAddSong);
+                setState(() {});
+                return;
+              } else if (parsedAddSong["response_type"] ==
+                  "song_already_exists") {
+                downloadStarted = false;
+                showToast(
+                    "La canzone già esiste sul database, come hai fatto ad ottenere questo errore");
+                SharedPreferences prefs = await SharedPreferences.getInstance();
+                prefs.setString('access_token',
+                    parsedAddSong["response_body"]["access_token"].toString());
+                print(parsedAddSong);
+                setState(() {});
+                return;
+              } else if (parsedAddSong["response_type"] ==
+                  "access_token_expired") {
+                var url = Uri.parse(
+                    'https://api.flowsmusic.it/OAuth/get_access_token.php');
+                var response = await http.post(url, body: {
+                  'refresh_token': refreshToken,
+                });
+                if (response.statusCode == 200) {
+                  var responseParsed = convert.jsonDecode(response.body);
+                  if (responseParsed["response_type"] ==
+                      "access_token_created_correctly") {
+                    SharedPreferences prefs =
+                        await SharedPreferences.getInstance();
+                    await prefs.setString('access_token',
+                        responseParsed["response_body"]["access_token"]);
+                    addSong(index);
+                  } else if (responseParsed["response_type"] ==
+                      "refresh_token_expired") {
+                    showToast("Token Expired, logging out of the account");
+                    SharedPreferences prefs =
+                        await SharedPreferences.getInstance();
+                    prefs.clear();
+                    downloadStarted = false;
+                    setState(() {});
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => LoginScreen(),
+                      ),
+                    );
+                  }
+                }
               }
             }
           }
