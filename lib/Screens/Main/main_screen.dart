@@ -31,7 +31,7 @@ class MainScreenPage extends StatefulWidget {
 }
 
 class _MainScreenPageState extends State<MainScreenPage> {
-  CardManager _cardManager;
+  //CardManager _cardManager;
   List<String> urls = [
     'https://sechisimone.altervista.org/flows/songs/RADICAL__MINACCIA.mp3',
     "http://135.125.44.178/songs/a3b44c0172b8c62e9fc621ecbb72bacf.mp3",
@@ -41,7 +41,7 @@ class _MainScreenPageState extends State<MainScreenPage> {
   @override
   void initState() {
     super.initState();
-    _cardManager = new CardManager(urls[0]);
+    //_cardManager = new CardManager(urls[0]);
   }
 
   List<Widget> buildPage(BuildContext context) {
@@ -76,8 +76,7 @@ class _MainScreenPageState extends State<MainScreenPage> {
                             onPressed: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(
-                                    builder: (context) => SettingsScreen()),
+                                MaterialPageRoute(builder: (context) => SettingsScreen()),
                               );
                             }),
                       ],
@@ -97,8 +96,7 @@ class _MainScreenPageState extends State<MainScreenPage> {
                                 onPressed: () {
                                   Navigator.push(
                                     context,
-                                    MaterialPageRoute(
-                                        builder: (context) => SettingsScreen()),
+                                    MaterialPageRoute(builder: (context) => SettingsScreen()),
                                   );
                                 }),
                           ],
@@ -112,7 +110,7 @@ class _MainScreenPageState extends State<MainScreenPage> {
           Center(
             child: buildPage(context).elementAt(_selectedIndex),
           ),
-          Miniplayer(
+          /*Miniplayer(
             minHeight: 70,
             backgroundColor: Colors.transparent,
             maxHeight: 70,
@@ -148,7 +146,7 @@ class _MainScreenPageState extends State<MainScreenPage> {
                 ),
               );
             },
-          ),
+          ),*/
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(

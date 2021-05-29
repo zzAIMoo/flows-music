@@ -20,9 +20,7 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   ScrollController _scrollController = new ScrollController();
-  bool isPerformingRequest = false,
-      addedShimmer = false,
-      downloadStarted = false;
+  bool isPerformingRequest = false, addedShimmer = false, downloadStarted = false, isPlaying = false;
   SearchBar searchBar;
   static String key = "AIzaSyBgARzrg0k-ro-BbdTxYfWuwvNtIC6osXA";
   String accessToken = "", refreshToken = "";
@@ -67,52 +65,45 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  callAPI(String text) async {
-    ytResult = await ytApi.search(text);
-    isPerformingRequest = false;
-    setState(() {
-      results.addAll(ytResult);
-    });
-  }
-
   void onSubmitted(String value) async {
-    doesItExist = [];
+    doesItExist.clear();
     if (!isPerformingRequest) {
+      isPerformingRequest = true;
       setState(() {
         _scrollController.jumpTo(0);
-        isPerformingRequest = true;
       });
       List<YT_API> newResults = await ytApi.search(value);
       if (newResults.length == 0) {
         showToast(
             "Non esistono video con questo argomento di ricerca, se non trovi una canzone prova ad aggiungere \"Topic\" ai termini di ricerca");
       }
-      isPerformingRequest = false;
       results = newResults;
-      int i = 0;
-      results.forEach((element) async {
-        doesItExist.add(await songExists(i));
+      int i = doesItExist.length;
+      print("lunghezza: " + doesItExist.length.toString());
+      await Future.forEach(results, (element) async {
+        await songExists(i);
+        print(doesItExist);
         i++;
       });
-      print("esiste: \n\n\n\n");
-      print(doesItExist);
-      print("esiste: \n\n\n\n");
+      isPerformingRequest = false;
       setState(() {});
     }
+  }
+
+  checkIfEquivalent(List<bool> array1, List<YT_API> array2) {
+    return array1.length == array2.length;
   }
 
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(() {
-      if (_scrollController.position.pixels >=
-          _scrollController.position.maxScrollExtent - 50) {
+      if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 50) {
         _getMoreData();
       }
     });
     doStuff();
-    _cardManager = new CardManager(
-        "http://135.125.44.178/songs/a3b44c0172b8c62e9fc621ecbb72bacf.mp3");
+    //_cardManager = new CardManager("http://135.125.44.178/songs/a3b44c0172b8c62e9fc621ecbb72bacf.mp3");
   }
 
   @override
@@ -123,25 +114,22 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   _getMoreData() async {
+    doesItExist.clear();
     if (!isPerformingRequest) {
-      setState(() {
-        isPerformingRequest = true;
-      });
+      setState(() {});
       List<YT_API> newEntries = await ytApi.nextPage();
       if (newEntries == null) {
-        isPerformingRequest = false;
         return;
       }
-      setState(() {
-        isPerformingRequest = false;
-        results.addAll(newEntries);
-        int i = 0;
-        results.forEach((element) {
-          songExists(i);
-          i++;
-        });
+      results.addAll(newEntries);
+      int i = doesItExist.length;
+      print("lunghezza: " + doesItExist.length.toString());
+      await Future.forEach(results, (element) async {
+        await songExists(i);
         print(doesItExist);
+        i++;
       });
+      setState(() {});
     }
   }
 
@@ -218,7 +206,10 @@ class _SearchScreenState extends State<SearchScreen> {
                           : !doesItExist[index]
                               ? !downloadStarted
                                   ? MaterialButton(
-                                      onPressed: () => addSong(index),
+                                      onPressed: () {
+                                        print(index);
+                                        addSong(index);
+                                      },
                                       color: Color(0xFF6F35A5),
                                       textColor: Colors.white,
                                       child: Icon(
@@ -237,34 +228,35 @@ class _SearchScreenState extends State<SearchScreen> {
                                         ),
                                       ),
                                     )
-                              : ValueListenableBuilder<ButtonState>(
-                                  valueListenable: _cardManager.buttonNotifier,
-                                  builder: (_, value, __) {
-                                    switch (value) {
-                                      case ButtonState.loading:
-                                        return Container(
-                                          margin: EdgeInsets.all(8.0),
-                                          width: 32.0,
-                                          height: 32.0,
-                                          child: CircularProgressIndicator(),
-                                        );
-                                      case ButtonState.paused:
-                                        return IconButton(
-                                          icon: Icon(Icons.play_arrow),
-                                          iconSize: 32.0,
-                                          onPressed: _cardManager.play,
-                                        );
-                                      case ButtonState.playing:
-                                        return IconButton(
-                                          icon: Icon(Icons.pause),
-                                          iconSize: 32.0,
-                                          onPressed: _cardManager.pause,
-                                        );
-                                      default:
-                                        return Container();
-                                    }
-                                  },
-                                ),
+                              : !isPlaying
+                                  ? MaterialButton(
+                                      onPressed: () {
+                                        print(index);
+                                        startSong(results[index].id);
+                                      },
+                                      color: Color(0xFF6F35A5),
+                                      textColor: Colors.white,
+                                      child: Icon(
+                                        Icons.play_arrow,
+                                        size: 16,
+                                      ),
+                                      shape: CircleBorder(),
+                                    )
+                                  : MaterialButton(
+                                      onPressed: () {
+                                        print(index);
+                                        _cardManager.pause();
+                                        isPlaying = false;
+                                        setState(() {});
+                                      },
+                                      color: Color(0xFF6F35A5),
+                                      textColor: Colors.white,
+                                      child: Icon(
+                                        Icons.pause,
+                                        size: 16,
+                                      ),
+                                      shape: CircleBorder(),
+                                    ),
                     ],
                   ),
                   Padding(padding: EdgeInsets.only(bottom: 1.5)),
@@ -289,47 +281,46 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
+  startSong(String id) {
+    isPlaying = true;
+    _cardManager = new CardManager("http://135.125.44.178/songs/" + md5.convert(convert.utf8.encode(id)).toString() + ".mp3");
+    _cardManager.play();
+    setState(() {});
+  }
+
   Future<bool> songExists(int index) async {
-    var checkSongUrl =
-        Uri.parse("https://api.flowsmusic.it/read/check_song.php");
+    var checkSongUrl = Uri.parse("https://api.flowsmusic.it/read/check_song.php");
+    print(md5.convert(convert.utf8.encode(results[index].id)).toString());
     var responseCheckSong = await http.post(
       checkSongUrl,
       body: {
         "access_token": accessToken,
-        "song_file_name":
-            md5.convert(convert.utf8.encode(results[index].id)).toString(),
+        "song_file_name": md5.convert(convert.utf8.encode(results[index].id)).toString(),
       },
     );
     if (responseCheckSong.statusCode == 200) {
-      print(responseCheckSong.body);
       var parsedCheckSong = convert.jsonDecode(responseCheckSong.body);
       if (parsedCheckSong["response_type"] == "song_exists") {
-        _cardManager.setUrl("http://135.125.44.178/songs/" +
-            md5.convert(convert.utf8.encode(results[index].id)).toString() +
-            ".mp3");
-        print(doesItExist);
         doesItExist.add(true);
         return true;
       } else if (parsedCheckSong["response_type"] == "song_not_exists") {
-        print(doesItExist);
         doesItExist.add(false);
         return false;
       } else if (parsedCheckSong["response_type"] == "access_token_expired") {
-        var url =
-            Uri.parse('https://api.flowsmusic.it/OAuth/get_access_token.php');
+        var url = Uri.parse('https://api.flowsmusic.it/OAuth/get_access_token.php');
         var response = await http.post(url, body: {
           'refresh_token': refreshToken,
         });
         if (response.statusCode == 200) {
           var responseParsed = convert.jsonDecode(response.body);
-          if (responseParsed["response_type"] ==
-              "access_token_created_correctly") {
+          if (responseParsed["response_type"] == "access_token_created_correctly") {
             SharedPreferences prefs = await SharedPreferences.getInstance();
-            await prefs.setString('access_token',
-                responseParsed["response_body"]["access_token"]);
+            if (prefs.containsKey('access_token')) {
+              prefs.remove('access_token');
+            }
+            await prefs.setString('access_token', responseParsed["response_body"]["access_token"]);
             songExists(index);
-          } else if (responseParsed["response_type"] ==
-              "refresh_token_expired") {
+          } else if (responseParsed["response_type"] == "refresh_token_expired") {
             showToast("Token Expired, logging out of the account");
             SharedPreferences prefs = await SharedPreferences.getInstance();
             prefs.clear();
@@ -356,29 +347,21 @@ class _SearchScreenState extends State<SearchScreen> {
     downloadStarted = true;
     setState(() {});
     List<String> tags = [];
-    var lastfmUrl = Uri.encodeFull(
-        "https://ws.audioscrobbler.com/2.0/?method=artist.gettoptags&artist=" +
-            results[index]
-                .channelTitle
-                .toLowerCase()
-                .replaceAll("vevo", "")
-                .replaceAll("- Topic", "") +
-            "&api_key=4d70550343db4aa79b0f2fc6c5a9867b&format=json&autocorrect=1");
+    var lastfmUrl = Uri.encodeFull("https://ws.audioscrobbler.com/2.0/?method=artist.gettoptags&artist=" +
+        results[index].channelTitle.toLowerCase().replaceAll("vevo", "").replaceAll("- Topic", "") +
+        "&api_key=4d70550343db4aa79b0f2fc6c5a9867b&format=json&autocorrect=1");
     var responseFM = await http.get(lastfmUrl);
     if (responseFM.statusCode == 200) {
       var responseParsed = convert.jsonDecode(responseFM.body);
       if (responseParsed["error"] == 6) {
         downloadStarted = false;
         setState(() {});
-        showToast(
-            "Impossibile trovare l'artista, non ti verranno consigliate canzoni in base agli ascolti su questa canzone");
-      } else if (responseParsed["toptags"].length == 2 ||
-          responseParsed["error"] == 6) {
+        showToast("Impossibile trovare l'artista, non ti verranno consigliate canzoni in base agli ascolti su questa canzone");
+      } else if (responseParsed["toptags"].length == 2 || responseParsed["error"] == 6) {
         results[index].title.split(" -").forEach((element) async {
-          var url = Uri.encodeFull(
-              "https://ws.audioscrobbler.com/2.0/?method=artist.gettoptags&artist=" +
-                  element.replaceAll(" ", "+") +
-                  "&api_key=4d70550343db4aa79b0f2fc6c5a9867b&format=json&autocorrect=1");
+          var url = Uri.encodeFull("https://ws.audioscrobbler.com/2.0/?method=artist.gettoptags&artist=" +
+              element.replaceAll(" ", "+") +
+              "&api_key=4d70550343db4aa79b0f2fc6c5a9867b&format=json&autocorrect=1");
           var responseInside = await http.get(url);
           if (responseInside.statusCode == 200) {
             var parsed = convert.jsonDecode(responseInside.body);
@@ -395,74 +378,67 @@ class _SearchScreenState extends State<SearchScreen> {
           tags.forEach((element) {
             tagsForRequest += element.toString() + " ";
           });
-          var addSongUrl =
-              Uri.parse("https://api.flowsmusic.it/create/add_song.php");
+          var addSongUrl = Uri.parse("https://api.flowsmusic.it/create/add_song.php");
           var responseAddSong = await http.post(
             addSongUrl,
             body: {
               "access_token": accessToken,
-              "song_file_name": md5
-                  .convert(convert.utf8.encode(results[index].id))
-                  .toString(),
+              "song_file_name": md5.convert(convert.utf8.encode(results[index].id)).toString(),
               "song_name": results[index].title,
               "artist_name": artistName,
               "artist_tags": tagsForRequest,
             },
           );
-          downloadStarted = false;
           if (responseAddSong.statusCode == 200) {
+            print(responseAddSong.body);
             var parsedAddSong = convert.jsonDecode(responseAddSong.body);
+            print(parsedAddSong);
             if (parsedAddSong["response_type"] == "song_added") {
               SharedPreferences prefs = await SharedPreferences.getInstance();
-              prefs.setString('access_token',
-                  parsedAddSong["response_body"]["access_token"].toString());
-              downloadStarted = false;
-              print(parsedAddSong);
-              setState(() {});
+              prefs.setString('access_token', parsedAddSong["response_body"]["access_token"].toString());
+              setState(() {
+                doesItExist[index] = true;
+              });
+              var downloadUrl = Uri.parse('http://135.125.44.178:5000/url?id=' + results[index].id);
+              var responseDownload = await http.get(downloadUrl);
+              print('Response status: ${responseDownload.statusCode}');
+              print('Response body: ${responseDownload.body}');
+              if (responseDownload.statusCode == 200) {
+                print(responseDownload);
+                downloadStarted = false;
+              }
               return;
-            } else if (parsedAddSong["response_type"] ==
-                "artist_already_exists") {
-              showToast(
-                  "L'artista già esiste, come hai datto ad ottenere questo errore");
+            } else if (parsedAddSong["response_type"] == "artist_already_exists") {
+              showToast("L'artista già esiste, come hai datto ad ottenere questo errore");
               SharedPreferences prefs = await SharedPreferences.getInstance();
-              prefs.setString('access_token',
-                  parsedAddSong["response_body"]["access_token"].toString());
+              prefs.setString('access_token', parsedAddSong["response_body"]["access_token"].toString());
               downloadStarted = false;
-              print(parsedAddSong);
               setState(() {});
               return;
-            } else if (parsedAddSong["response_type"] ==
-                "song_already_exists") {
+            } else if (parsedAddSong["response_type"] == "song_already_exists") {
               downloadStarted = false;
-              showToast(
-                  "La canzone già esiste sul database, come hai fatto ad ottenere questo errore");
+              showToast("La canzone già esiste sul database, come hai fatto ad ottenere questo errore");
               SharedPreferences prefs = await SharedPreferences.getInstance();
-              prefs.setString('access_token',
-                  parsedAddSong["response_body"]["access_token"].toString());
-              print(parsedAddSong);
+              prefs.setString('access_token', parsedAddSong["response_body"]["access_token"].toString());
               setState(() {});
               return;
-            } else if (parsedAddSong["response_type"] ==
-                "access_token_expired") {
-              var url = Uri.parse(
-                  'https://api.flowsmusic.it/OAuth/get_access_token.php');
+            } else if (parsedAddSong["response_type"] == "access_token_expired") {
+              var url = Uri.parse('https://api.flowsmusic.it/OAuth/get_access_token.php');
               var response = await http.post(url, body: {
                 'refresh_token': refreshToken,
               });
               if (response.statusCode == 200) {
                 var responseParsed = convert.jsonDecode(response.body);
-                if (responseParsed["response_type"] ==
-                    "access_token_created_correctly") {
-                  SharedPreferences prefs =
-                      await SharedPreferences.getInstance();
-                  await prefs.setString('access_token',
-                      responseParsed["response_body"]["access_token"]);
+                if (responseParsed["response_type"] == "access_token_created_correctly") {
+                  SharedPreferences prefs = await SharedPreferences.getInstance();
+                  if (prefs.containsKey('access_token')) {
+                    prefs.remove('access_token');
+                  }
+                  await prefs.setString('access_token', responseParsed["response_body"]["access_token"]);
                   addSong(index);
-                } else if (responseParsed["response_type"] ==
-                    "refresh_token_expired") {
+                } else if (responseParsed["response_type"] == "refresh_token_expired") {
                   showToast("Token Expired, logging out of the account");
-                  SharedPreferences prefs =
-                      await SharedPreferences.getInstance();
+                  SharedPreferences prefs = await SharedPreferences.getInstance();
                   prefs.clear();
                   downloadStarted = false;
                   setState(() {});
@@ -475,16 +451,14 @@ class _SearchScreenState extends State<SearchScreen> {
                 }
               }
             }
+          } else {
+            print("ciao");
           }
           downloadStarted = false;
           setState(() {});
         });
       } else {
-        artistName = results[index]
-            .channelTitle
-            .toLowerCase()
-            .replaceAll("vevo", "")
-            .replaceAll("- Topic", "");
+        artistName = results[index].channelTitle.toLowerCase().replaceAll("vevo", "").replaceAll("- Topic", "");
         responseParsed["toptags"]["tag"].forEach((element) {
           if (element["count"] >= 70) {
             tags.add(element["name"]);
@@ -494,15 +468,12 @@ class _SearchScreenState extends State<SearchScreen> {
         tags.forEach((element) {
           tagsForRequest += element.toString() + " ";
         });
-        var addSongUrl =
-            Uri.parse("https://api.flowsmusic.it/create/add_song.php");
+        var addSongUrl = Uri.parse("https://api.flowsmusic.it/create/add_song.php");
         var responseAddSong = await http.post(
           addSongUrl,
           body: {
             "access_token": accessToken,
-            "song_file_name": md5
-                .convert(convert.utf8.encode(results[index].title))
-                .toString(),
+            "song_file_name": md5.convert(convert.utf8.encode(results[index].title)).toString(),
             "song_name": results[index].title,
             "artist_name": artistName,
             "artist_tags": tagsForRequest,
@@ -511,37 +482,45 @@ class _SearchScreenState extends State<SearchScreen> {
         downloadStarted = false;
         if (responseAddSong.statusCode == 200) {
           var parsedAddSong = convert.jsonDecode(responseAddSong.body);
+          print(parsedAddSong);
           if (parsedAddSong["response_type"] == "song_added") {
             SharedPreferences prefs = await SharedPreferences.getInstance();
-            prefs.setString('access_token',
-                responseParsed["response_body"]["access_token"].toString());
-            downloadStarted = false;
-            setState(() {});
+            prefs.setString('access_token', responseParsed["response_body"]["access_token"].toString());
+            setState(() {
+              doesItExist[index] = true;
+            });
+            var downloadUrl = Uri.parse('http://135.125.44.178:5000/url?id=' + results[index].id);
+            var responseDownload = await http.get(downloadUrl);
+            print('Response status: ${responseDownload.statusCode}');
+            print('Response body: ${responseDownload.body}');
+            if (responseDownload.statusCode == 200) {
+              print(responseDownload);
+              downloadStarted = false;
+            }
             return;
           } else if (parsedAddSong["response_type"] == "error_in_adding") {
             showToast("C'è stato un errore nel download della canzone");
             SharedPreferences prefs = await SharedPreferences.getInstance();
-            prefs.setString('access_token',
-                responseParsed["response_body"]["access_token"].toString());
+            prefs.setString('access_token', responseParsed["response_body"]["access_token"].toString());
             downloadStarted = false;
             setState(() {});
             return;
           } else if (parsedAddSong["response_type"] == "access_token_expired") {
-            var url = Uri.parse(
-                'https://api.flowsmusic.it/OAuth/get_access_token.php');
+            var url = Uri.parse('https://api.flowsmusic.it/OAuth/get_access_token.php');
             var response = await http.post(url, body: {
               'refresh_token': refreshToken,
             });
             if (response.statusCode == 200) {
               var responseParsed = convert.jsonDecode(response.body);
-              if (responseParsed["response_type"] ==
-                  "access_token_created_correctly") {
+              print(responseAddSong);
+              if (responseParsed["response_type"] == "access_token_created_correctly") {
                 SharedPreferences prefs = await SharedPreferences.getInstance();
-                await prefs.setString('access_token',
-                    responseParsed["response_body"]["access_token"]);
+                if (prefs.containsKey('access_token')) {
+                  prefs.remove('access_token');
+                }
+                await prefs.setString('access_token', responseParsed["response_body"]["access_token"]);
                 addSong(index);
-              } else if (responseParsed["response_type"] ==
-                  "refresh_token_expired") {
+              } else if (responseParsed["response_type"] == "refresh_token_expired") {
                 showToast("Token Expired, logging out of the account");
                 SharedPreferences prefs = await SharedPreferences.getInstance();
                 prefs.clear();
@@ -557,57 +536,56 @@ class _SearchScreenState extends State<SearchScreen> {
             }
             if (responseAddSong.statusCode == 200) {
               var parsedAddSong = convert.jsonDecode(responseAddSong.body);
+              print(parsedAddSong);
               if (parsedAddSong["response_type"] == "song_added") {
                 SharedPreferences prefs = await SharedPreferences.getInstance();
-                prefs.setString('access_token',
-                    parsedAddSong["response_body"]["access_token"].toString());
-                downloadStarted = false;
-                print(parsedAddSong);
-                setState(() {});
+                prefs.setString('access_token', parsedAddSong["response_body"]["access_token"].toString());
+                print("ciao" + parsedAddSong);
+                setState(() {
+                  doesItExist[index] = true;
+                });
+                var downloadUrl = Uri.parse('http://135.125.44.178:5000/url?id=' + results[index].id);
+                var responseDownload = await http.get(downloadUrl);
+                print('Response status: ${responseDownload.statusCode}');
+                print('Response body: ${responseDownload.body}');
+                if (responseDownload.statusCode == 200) {
+                  print(responseDownload);
+                  downloadStarted = false;
+                }
                 return;
-              } else if (parsedAddSong["response_type"] ==
-                  "artist_already_exists") {
-                showToast(
-                    "L'artista già esiste, come hai datto ad ottenere questo errore");
+              } else if (parsedAddSong["response_type"] == "artist_already_exists") {
+                showToast("L'artista già esiste, come hai datto ad ottenere questo errore");
                 SharedPreferences prefs = await SharedPreferences.getInstance();
-                prefs.setString('access_token',
-                    parsedAddSong["response_body"]["access_token"].toString());
+                prefs.setString('access_token', parsedAddSong["response_body"]["access_token"].toString());
                 downloadStarted = false;
-                print(parsedAddSong);
+                print("primo" + parsedAddSong);
                 setState(() {});
                 return;
-              } else if (parsedAddSong["response_type"] ==
-                  "song_already_exists") {
+              } else if (parsedAddSong["response_type"] == "song_already_exists") {
                 downloadStarted = false;
-                showToast(
-                    "La canzone già esiste sul database, come hai fatto ad ottenere questo errore");
+                showToast("La canzone già esiste sul database, come hai fatto ad ottenere questo errore");
                 SharedPreferences prefs = await SharedPreferences.getInstance();
-                prefs.setString('access_token',
-                    parsedAddSong["response_body"]["access_token"].toString());
-                print(parsedAddSong);
+                prefs.setString('access_token', parsedAddSong["response_body"]["access_token"].toString());
+                print("lmao" + parsedAddSong);
                 setState(() {});
                 return;
-              } else if (parsedAddSong["response_type"] ==
-                  "access_token_expired") {
-                var url = Uri.parse(
-                    'https://api.flowsmusic.it/OAuth/get_access_token.php');
+              } else if (parsedAddSong["response_type"] == "access_token_expired") {
+                var url = Uri.parse('https://api.flowsmusic.it/OAuth/get_access_token.php');
                 var response = await http.post(url, body: {
                   'refresh_token': refreshToken,
                 });
                 if (response.statusCode == 200) {
                   var responseParsed = convert.jsonDecode(response.body);
-                  if (responseParsed["response_type"] ==
-                      "access_token_created_correctly") {
-                    SharedPreferences prefs =
-                        await SharedPreferences.getInstance();
-                    await prefs.setString('access_token',
-                        responseParsed["response_body"]["access_token"]);
+                  if (responseParsed["response_type"] == "access_token_created_correctly") {
+                    SharedPreferences prefs = await SharedPreferences.getInstance();
+                    if (prefs.containsKey('access_token')) {
+                      prefs.remove('access_token');
+                    }
+                    await prefs.setString('access_token', responseParsed["response_body"]["access_token"]);
                     addSong(index);
-                  } else if (responseParsed["response_type"] ==
-                      "refresh_token_expired") {
+                  } else if (responseParsed["response_type"] == "refresh_token_expired") {
                     showToast("Token Expired, logging out of the account");
-                    SharedPreferences prefs =
-                        await SharedPreferences.getInstance();
+                    SharedPreferences prefs = await SharedPreferences.getInstance();
                     prefs.clear();
                     downloadStarted = false;
                     setState(() {});
@@ -624,39 +602,15 @@ class _SearchScreenState extends State<SearchScreen> {
           }
           downloadStarted = false;
         }
+        downloadStarted = false;
       }
+      downloadStarted = false;
     }
 
     //fare richiesta all'api per aggiungere song sul db
 
 /*
-                                var downloadUrl = Uri.parse(
-                                    'http://135.125.44.178:5000/url?id=' +
-                                        results[index].id);
-                                var responseDownload =
-                                    await http.get(downloadUrl);
-                                print(
-                                    'Response status: ${responseDownload.statusCode}');
-                                print(
-                                    'Response body: ${responseDownload.body}');
-                                if (responseDownload.statusCode == 200) {
-                                  print(responseDownload);
-                                  downloadStarted = false;
-                                  //results[index].id
-                                }
-
-                                var addSongUrl = Uri.parse(
-                                    "https://api.flowsmusic.it/create/add_song.php");
-                                var responseAddSong =
-                                    await http.get(addSongUrl);
-                                print(
-                                    'Response status: ${responseAddSong.statusCode}');
-                                print('Response body: ${responseAddSong.body}');
-                                if (responseAddSong.statusCode == 200) {
-                                  print(responseAddSong);
-                                  downloadStarted = false;
-                                  //results[index].id
-                                }*/
+                                */
   }
 
   Widget returnShimmer() {
