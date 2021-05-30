@@ -20,10 +20,10 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   ScrollController _scrollController = new ScrollController();
-  bool isPerformingRequest = false, addedShimmer = false, downloadStarted = false, isPlaying = false;
+  bool isPerformingRequest = false, downloadStarted = false, isPlaying = false;
   SearchBar searchBar;
   static String key = "AIzaSyBgARzrg0k-ro-BbdTxYfWuwvNtIC6osXA";
-  String accessToken = "", refreshToken = "";
+  String accessToken = "", refreshToken = "", lastSearch = "";
   CardManager _cardManager;
 
   YoutubeAPI ytApi = YoutubeAPI(key, maxResults: 16, type: "video");
@@ -32,11 +32,17 @@ class _SearchScreenState extends State<SearchScreen> {
 
   void doStuff() async {
     await getSharedPrefs();
+    if (doesItExist.length == 0) {
+      onSubmitted(lastSearch);
+    }
   }
 
   Future<Null> getSharedPrefs() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     accessToken = prefs.getString("access_token");
+    if (prefs.containsKey("last_search")) {
+      lastSearch = prefs.getString("last_search");
+    }
     print("access-token:" + accessToken);
     refreshToken = prefs.getString("refresh_token");
   }
@@ -46,7 +52,7 @@ class _SearchScreenState extends State<SearchScreen> {
       title: new Text('Cerca un media'),
       backgroundColor: Color(0xFF6F35A5),
       foregroundColor: Colors.white,
-      actions: [searchBar.getSearchAction(context)],
+      actions: [!isPerformingRequest ? searchBar.getSearchAction(context) : Container()],
       textTheme: TextTheme(
         headline6: TextStyle(
           color: Colors.white,
@@ -67,25 +73,30 @@ class _SearchScreenState extends State<SearchScreen> {
 
   void onSubmitted(String value) async {
     doesItExist.clear();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString("last_search", value);
     if (!isPerformingRequest) {
-      isPerformingRequest = true;
       setState(() {
+        isPerformingRequest = true;
         _scrollController.jumpTo(0);
       });
       List<YT_API> newResults = await ytApi.search(value);
       if (newResults.length == 0) {
-        showToast(
-            "Non esistono video con questo argomento di ricerca, se non trovi una canzone prova ad aggiungere \"Topic\" ai termini di ricerca");
+        return;
       }
       results = newResults;
       int i = doesItExist.length;
       print("lunghezza: " + doesItExist.length.toString());
-      await Future.forEach(results, (element) async {
+      Future.forEach(results, (element) async {
         await songExists(i);
         print(doesItExist);
         i++;
+      }).then((value) {
+        setState(() {
+          isPerformingRequest = false;
+        });
       });
-      isPerformingRequest = false;
+
       setState(() {});
     }
   }
@@ -194,12 +205,34 @@ class _SearchScreenState extends State<SearchScreen> {
                   Row(
                     children: [
                       Container(
-                        width: MediaQuery.of(context).size.width / 2.6,
+                        width: MediaQuery.of(context).size.width / 3.8,
                         child: Text(
                           results[index].title,
                           softWrap: true,
                           style: TextStyle(fontSize: 14.0),
                         ),
+                      ),
+                      /*PopupMenuButton(
+                        shape: CircleBorder(side: BorderSide(width:15)),
+                        itemBuilder: (context) {
+                          List<PopupMenuEntry<Object>> list = [];
+                          list.add(
+                            PopupMenuItem(child: Text('Add Playlist'), value: 1),
+                          );
+                        },
+                      ),*/
+                      PopupMenuButton(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(15.0),
+                          ),
+                        ),
+                        itemBuilder: (BuildContext bc) => [
+                          PopupMenuItem(child: Text("Add to favourites!"), value: "add_to_favourites"),
+                        ],
+                        onSelected: (value) {
+                          handleFunctions("Add to favourites", results[index].id);
+                        },
                       ),
                       doesItExist.length == 0
                           ? Container()
@@ -281,7 +314,37 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  startSong(String id) {
+  dynamic handleFunctions(String value, String id) {
+    handleClick(value, id);
+  }
+
+  void handleClick(String value, String id) async {
+    switch (value) {
+      case 'Add to favourites':
+        var addToPlaylistUrl = Uri.parse("https://api.flowsmusic.it/create/add_to_playlist.php");
+        String songFileLink = md5.convert(convert.utf8.encode(id)).toString();
+        var responseAddToPlaylist = await http.post(
+          addToPlaylistUrl,
+          body: {
+            "access_token": accessToken,
+            "song_file_name": songFileLink,
+            "playlist_name": "favourites",
+          },
+        );
+        if (responseAddToPlaylist.statusCode == 200) {
+          print(responseAddToPlaylist.body);
+          var responseParsed = convert.jsonDecode(responseAddToPlaylist.body);
+          if (responseParsed["response_type"] == "song_added_to_playlist") {
+            showToast("Song added correctly to your favourites");
+          } else if (responseParsed["response_type"] == "error_in_adding") {
+            showToast("There was an error adding the song, please retry");
+          }
+          break;
+        }
+    }
+  }
+
+  void startSong(String id) {
     isPlaying = true;
     _cardManager = new CardManager("http://135.125.44.178/songs/" + md5.convert(convert.utf8.encode(id)).toString() + ".mp3");
     _cardManager.play();
@@ -315,22 +378,21 @@ class _SearchScreenState extends State<SearchScreen> {
           var responseParsed = convert.jsonDecode(response.body);
           if (responseParsed["response_type"] == "access_token_created_correctly") {
             SharedPreferences prefs = await SharedPreferences.getInstance();
-            if (prefs.containsKey('access_token')) {
-              prefs.remove('access_token');
-            }
-            await prefs.setString('access_token', responseParsed["response_body"]["access_token"]);
-            songExists(index);
+            prefs.setString('access_token', responseParsed["response_body"]["access_token"]).then((value) {
+              songExists(index);
+            });
           } else if (responseParsed["response_type"] == "refresh_token_expired") {
             showToast("Token Expired, logging out of the account");
             SharedPreferences prefs = await SharedPreferences.getInstance();
             prefs.clear();
             downloadStarted = false;
             setState(() {});
-            Navigator.pushReplacement(
+            Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(
                 builder: (context) => LoginScreen(),
               ),
+              (Route route) => false,
             );
             return false;
           }
@@ -342,24 +404,20 @@ class _SearchScreenState extends State<SearchScreen> {
     return false;
   }
 
-  addSong(int index) async {
+  void addSong(int index) async {
     String artistName = "";
     downloadStarted = true;
     setState(() {});
     List<String> tags = [];
-    var lastfmUrl = Uri.encodeFull("https://ws.audioscrobbler.com/2.0/?method=artist.gettoptags&artist=" +
+    var lastfmUrl = Uri.encodeFull("https://ws.audioscrobbler.com/2.0/?method=artist.gettoptags&autocorrect=1&artist=" +
         results[index].channelTitle.toLowerCase().replaceAll("vevo", "").replaceAll("- Topic", "") +
         "&api_key=4d70550343db4aa79b0f2fc6c5a9867b&format=json&autocorrect=1");
     var responseFM = await http.get(lastfmUrl);
     if (responseFM.statusCode == 200) {
       var responseParsed = convert.jsonDecode(responseFM.body);
-      if (responseParsed["error"] == 6) {
-        downloadStarted = false;
-        setState(() {});
-        showToast("Impossibile trovare l'artista, non ti verranno consigliate canzoni in base agli ascolti su questa canzone");
-      } else if (responseParsed["toptags"].length == 2 || responseParsed["error"] == 6) {
+      if (responseParsed["error"] == 6 || responseParsed["toptags"].length == 2) {
         results[index].title.split(" -").forEach((element) async {
-          var url = Uri.encodeFull("https://ws.audioscrobbler.com/2.0/?method=artist.gettoptags&artist=" +
+          var url = Uri.encodeFull("https://ws.audioscrobbler.com/2.0/?method=artist.gettoptags&autocorrect=1artist=" +
               element.replaceAll(" ", "+") +
               "&api_key=4d70550343db4aa79b0f2fc6c5a9867b&format=json&autocorrect=1");
           var responseInside = await http.get(url);
@@ -431,28 +489,25 @@ class _SearchScreenState extends State<SearchScreen> {
                 var responseParsed = convert.jsonDecode(response.body);
                 if (responseParsed["response_type"] == "access_token_created_correctly") {
                   SharedPreferences prefs = await SharedPreferences.getInstance();
-                  if (prefs.containsKey('access_token')) {
-                    prefs.remove('access_token');
-                  }
-                  await prefs.setString('access_token', responseParsed["response_body"]["access_token"]);
-                  addSong(index);
+                  prefs.setString('access_token', responseParsed["response_body"]["access_token"]).then((value) {
+                    addSong(index);
+                  });
                 } else if (responseParsed["response_type"] == "refresh_token_expired") {
                   showToast("Token Expired, logging out of the account");
                   SharedPreferences prefs = await SharedPreferences.getInstance();
                   prefs.clear();
                   downloadStarted = false;
                   setState(() {});
-                  Navigator.pushReplacement(
+                  Navigator.pushAndRemoveUntil(
                     context,
                     MaterialPageRoute(
                       builder: (context) => LoginScreen(),
                     ),
+                    (Route route) => false,
                   );
                 }
               }
             }
-          } else {
-            print("ciao");
           }
           downloadStarted = false;
           setState(() {});
@@ -479,7 +534,6 @@ class _SearchScreenState extends State<SearchScreen> {
             "artist_tags": tagsForRequest,
           },
         );
-        downloadStarted = false;
         if (responseAddSong.statusCode == 200) {
           var parsedAddSong = convert.jsonDecode(responseAddSong.body);
           print(parsedAddSong);
@@ -515,22 +569,21 @@ class _SearchScreenState extends State<SearchScreen> {
               print(responseAddSong);
               if (responseParsed["response_type"] == "access_token_created_correctly") {
                 SharedPreferences prefs = await SharedPreferences.getInstance();
-                if (prefs.containsKey('access_token')) {
-                  prefs.remove('access_token');
-                }
-                await prefs.setString('access_token', responseParsed["response_body"]["access_token"]);
-                addSong(index);
+                prefs.setString('access_token', responseParsed["response_body"]["access_token"]).then((value) {
+                  addSong(index);
+                });
               } else if (responseParsed["response_type"] == "refresh_token_expired") {
                 showToast("Token Expired, logging out of the account");
                 SharedPreferences prefs = await SharedPreferences.getInstance();
                 prefs.clear();
                 downloadStarted = false;
                 setState(() {});
-                Navigator.pushReplacement(
+                Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(
                     builder: (context) => LoginScreen(),
                   ),
+                  (Route route) => false,
                 );
               }
             }
@@ -578,22 +631,21 @@ class _SearchScreenState extends State<SearchScreen> {
                   var responseParsed = convert.jsonDecode(response.body);
                   if (responseParsed["response_type"] == "access_token_created_correctly") {
                     SharedPreferences prefs = await SharedPreferences.getInstance();
-                    if (prefs.containsKey('access_token')) {
-                      prefs.remove('access_token');
-                    }
-                    await prefs.setString('access_token', responseParsed["response_body"]["access_token"]);
-                    addSong(index);
+                    prefs.setString('access_token', responseParsed["response_body"]["access_token"]).then((value) {
+                      addSong(index);
+                    });
                   } else if (responseParsed["response_type"] == "refresh_token_expired") {
                     showToast("Token Expired, logging out of the account");
                     SharedPreferences prefs = await SharedPreferences.getInstance();
                     prefs.clear();
                     downloadStarted = false;
                     setState(() {});
-                    Navigator.pushReplacement(
+                    Navigator.pushAndRemoveUntil(
                       context,
                       MaterialPageRoute(
                         builder: (context) => LoginScreen(),
                       ),
+                      (Route route) => false,
                     );
                   }
                 }
@@ -606,11 +658,6 @@ class _SearchScreenState extends State<SearchScreen> {
       }
       downloadStarted = false;
     }
-
-    //fare richiesta all'api per aggiungere song sul db
-
-/*
-                                */
   }
 
   Widget returnShimmer() {

@@ -7,31 +7,12 @@ import 'package:flows/Screens/Settings/settings_screen.dart';
 import 'package:miniplayer/miniplayer.dart';
 //import 'package:image/image.dart' as IMG;
 
-void main() {}
-
-class MainScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'homeScreen',
-      theme: ThemeData(
-        primarySwatch: Colors.purple,
-      ),
-      home: MainScreenPage(title: 'Home'),
-    );
-  }
-}
-
 class MainScreenPage extends StatefulWidget {
-  MainScreenPage({Key key, this.title}) : super(key: key);
-  final String title;
-
   @override
   _MainScreenPageState createState() => _MainScreenPageState();
 }
 
 class _MainScreenPageState extends State<MainScreenPage> {
-  //CardManager _cardManager;
   List<String> urls = [
     'https://sechisimone.altervista.org/flows/songs/RADICAL__MINACCIA.mp3',
     "http://135.125.44.178/songs/a3b44c0172b8c62e9fc621ecbb72bacf.mp3",
@@ -41,7 +22,6 @@ class _MainScreenPageState extends State<MainScreenPage> {
   @override
   void initState() {
     super.initState();
-    //_cardManager = new CardManager(urls[0]);
   }
 
   List<Widget> buildPage(BuildContext context) {

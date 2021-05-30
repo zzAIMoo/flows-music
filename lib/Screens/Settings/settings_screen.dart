@@ -18,7 +18,7 @@ class SettingsScreen extends StatelessWidget {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => MainScreen()),
+                      MaterialPageRoute(builder: (context) => MainScreenPage()),
                     );
                   }),
             ],

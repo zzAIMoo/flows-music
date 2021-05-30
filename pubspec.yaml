@@ -29,9 +29,11 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.3
   flutter_spinkit: "^4.1.2"
+  sticky_headers: "^0.1.8"
   flutter_tindercard: ^0.2.0
   flutter_svg: ^0.22.0
   fluttertoast: ^8.0.7
+  marquee: ^2.1.0
   http: ^0.12.0+1
   loading_animations: "^2.1.0"
   shared_preferences: ^2.0.5

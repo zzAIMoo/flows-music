@@ -112,7 +112,7 @@ class _BodyState extends State<Body> {
                 }
                 requestStarted = true;
                 setState(() {});
-                var url = Uri.parse('http://135.125.44.178//flows/API/registration/signup.php');
+                var url = Uri.parse('https://api.flowsmusic.it/registration/signup.php');
                 var response = await http.post(url, body: {'email': email, 'username': username, 'password': psw});
                 print('Response status: ${response.statusCode}');
                 print('Response body: ${response.body}');
@@ -132,9 +132,12 @@ class _BodyState extends State<Body> {
                   } else if (responseParsed["response_type"] == "email_sent") {
                     requestStarted = false;
                     setState(() {});
-                    Navigator.pushReplacement(
+                    Navigator.pushAndRemoveUntil(
                       context,
-                      MaterialPageRoute(builder: (context) => LoginScreen()),
+                      MaterialPageRoute(
+                        builder: (context) => LoginScreen(),
+                      ),
+                      (Route route) => false,
                     );
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                       content: Text('Email di verifica inviata!'),
@@ -148,13 +151,12 @@ class _BodyState extends State<Body> {
             AlreadyHaveAnAccountCheck(
               login: false,
               press: () {
-                Navigator.push(
+                Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(
-                    builder: (context) {
-                      return LoginScreen();
-                    },
+                    builder: (context) => LoginScreen(),
                   ),
+                  (Route route) => false,
                 );
               },
             ),
