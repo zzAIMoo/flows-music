@@ -26,22 +26,31 @@ class _SearchScreenState extends State<SearchScreen> {
   String accessToken = "", refreshToken = "", lastSearch = "";
   CardManager _cardManager;
 
-  YoutubeAPI ytApi = YoutubeAPI(key, maxResults: 16, type: "video");
+  YoutubeAPI ytApi = YoutubeAPI(key, maxResults: 12, type: "video");
   List<YT_API> ytResult = [];
   List<bool> doesItExist = [];
+  List<String> doesItExistString = [];
 
   void doStuff() async {
-    await getSharedPrefs();
-    if (doesItExist.length == 0) {
-      onSubmitted(lastSearch);
-    }
+    getSharedPrefs().then((value) async {
+      print(doesItExistString);
+      Future.forEach(doesItExistString, (element) {
+        if (element == "1") {
+          doesItExist.add(true);
+        } else {
+          doesItExist.add(false);
+        }
+      }).then((value) {
+        setState(() {});
+      });
+    });
   }
 
   Future<Null> getSharedPrefs() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     accessToken = prefs.getString("access_token");
-    if (prefs.containsKey("last_search")) {
-      lastSearch = prefs.getString("last_search");
+    if (prefs.containsKey("does_it_exist")) {
+      doesItExistString.addAll(prefs.getStringList("does_it_exist"));
     }
     print("access-token:" + accessToken);
     refreshToken = prefs.getString("refresh_token");
@@ -73,6 +82,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
   void onSubmitted(String value) async {
     doesItExist.clear();
+    doesItExistString.clear();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString("last_search", value);
     if (!isPerformingRequest) {
@@ -86,12 +96,11 @@ class _SearchScreenState extends State<SearchScreen> {
       }
       results = newResults;
       int i = doesItExist.length;
-      print("lunghezza: " + doesItExist.length.toString());
       Future.forEach(results, (element) async {
         await songExists(i);
-        print(doesItExist);
         i++;
       }).then((value) {
+        prefs.setStringList("does_it_exist", doesItExistString);
         setState(() {
           isPerformingRequest = false;
         });
@@ -113,6 +122,8 @@ class _SearchScreenState extends State<SearchScreen> {
         _getMoreData();
       }
     });
+    doesItExist.clear();
+    doesItExistString.clear();
     doStuff();
     //_cardManager = new CardManager("http://135.125.44.178/songs/a3b44c0172b8c62e9fc621ecbb72bacf.mp3");
   }
@@ -120,12 +131,12 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   void dispose() {
     _scrollController.dispose();
-    _cardManager.dispose();
     super.dispose();
   }
 
   _getMoreData() async {
     doesItExist.clear();
+    doesItExistString.clear();
     if (!isPerformingRequest) {
       setState(() {});
       List<YT_API> newEntries = await ytApi.nextPage();
@@ -135,10 +146,13 @@ class _SearchScreenState extends State<SearchScreen> {
       results.addAll(newEntries);
       int i = doesItExist.length;
       print("lunghezza: " + doesItExist.length.toString());
-      await Future.forEach(results, (element) async {
+      Future.forEach(newEntries, (element) async {
         await songExists(i);
-        print(doesItExist);
         i++;
+      }).then((value) {
+        setState(() {
+          isPerformingRequest = false;
+        });
       });
       setState(() {});
     }
@@ -187,9 +201,13 @@ class _SearchScreenState extends State<SearchScreen> {
 
   Widget listItem(index) {
     return Card(
+      elevation: 6,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8.0),
+      ),
       child: Container(
-        margin: EdgeInsets.symmetric(vertical: 7.0),
-        padding: EdgeInsets.all(12.0),
+        margin: EdgeInsets.symmetric(vertical: 10.0),
+        padding: EdgeInsets.only(left: 12.0, top: 10, right: 12),
         child: Row(
           children: <Widget>[
             Image.network(
@@ -365,9 +383,11 @@ class _SearchScreenState extends State<SearchScreen> {
       var parsedCheckSong = convert.jsonDecode(responseCheckSong.body);
       if (parsedCheckSong["response_type"] == "song_exists") {
         doesItExist.add(true);
+        doesItExistString.add("1");
         return true;
       } else if (parsedCheckSong["response_type"] == "song_not_exists") {
         doesItExist.add(false);
+        doesItExistString.add("0");
         return false;
       } else if (parsedCheckSong["response_type"] == "access_token_expired") {
         var url = Uri.parse('https://api.flowsmusic.it/OAuth/get_access_token.php');

@@ -9,21 +9,6 @@ class SettingsScreen extends StatelessWidget {
       body: Body(),
       appBar: AppBar(
         title: Text("settings"),
-        actions: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              IconButton(
-                  icon: Icon(Icons.settings),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => MainScreenPage()),
-                    );
-                  }),
-            ],
-          ),
-        ],
       ),
     );
   }

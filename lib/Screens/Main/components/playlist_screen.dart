@@ -130,16 +130,13 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
       appBar: AppBar(
         title: Text(playlistName),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          children: [
-            Playlist(),
-            CurrentSongTitle(),
-            AudioProgressBar(),
-            AudioControlButtons(),
-          ],
-        ),
+      body: Column(
+        children: [
+          Playlist(),
+          CurrentSongTitle(),
+          AudioProgressBar(),
+          AudioControlButtons(),
+        ],
       ),
     );
   }
@@ -153,11 +150,13 @@ class CurrentSongTitle extends StatelessWidget {
       valueListenable: _pageManager.currentSongTitleNotifier,
       builder: (_, title, __) {
         return Padding(
-          padding: EdgeInsets.all(8.0),
+          padding: EdgeInsets.only(bottom: 10),
           child: Container(
             height: 50.0,
             color: Colors.white,
             child: Marquee(
+              velocity: 60,
+              blankSpace: 4,
               text: title,
             ),
           ),
@@ -178,37 +177,44 @@ class Playlist extends StatelessWidget {
           return ListView.builder(
             itemCount: playlistTitles.length,
             itemBuilder: (context, index) {
-              return Card(
-                elevation: 6,
-                shadowColor: Colors.black,
-                child: InkWell(
-                  onTap: () {
-                    _pageManager.seekIndex(index);
-                  },
-                  child: Container(
-                    margin: EdgeInsets.symmetric(vertical: 7.0),
-                    padding: EdgeInsets.all(12.0),
-                    child: Row(
-                      children: <Widget>[
-                        /*Image.network(
-                        "https://cdns.iconmonstr.com/wp-content/assets/preview/2012/240/iconmonstr-sound-wave-4.png",
-                      ),*/
-                        Padding(padding: EdgeInsets.only(right: 20.0)),
-                        Expanded(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Text(
-                                "${playlistTitles[index]}",
-                                softWrap: true,
-                                style: TextStyle(fontSize: 18.0),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
-                          ),
-                        )
-                      ],
+              return Padding(
+                padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+                child: Card(
+                  elevation: 6,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  shadowColor: Colors.grey[200],
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(8),
+                    focusColor: Colors.grey[200],
+                    highlightColor: Colors.grey[200],
+                    splashColor: Colors.grey[200],
+                    onTap: () {
+                      _pageManager.seekIndex(index);
+                    },
+                    child: Container(
+                      margin: EdgeInsets.symmetric(vertical: 7.0),
+                      padding: EdgeInsets.all(12.0),
+                      child: Row(
+                        children: <Widget>[
+                          Padding(padding: EdgeInsets.only(right: 20.0)),
+                          Expanded(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Text(
+                                  "${playlistTitles[index]}",
+                                  softWrap: true,
+                                  style: TextStyle(fontSize: 18.0),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -228,16 +234,19 @@ class AudioProgressBar extends StatelessWidget {
     return ValueListenableBuilder<ProgressBarState>(
       valueListenable: _pageManager.progressNotifier,
       builder: (_, value, __) {
-        return ProgressBar(
-          progressBarColor: Color(0xFF6F35A5),
-          thumbColor: Color(0xFF6F35A5),
-          baseBarColor: Color(0xFFDBC7ED),
-          thumbGlowColor: Color(0xFF6F35A5),
-          bufferedBarColor: Color(0xFFBF8EED),
-          progress: value.current,
-          buffered: value.buffered,
-          total: value.total,
-          onSeek: _pageManager.seek,
+        return Padding(
+          padding: EdgeInsets.only(left: 20, right: 20),
+          child: ProgressBar(
+            progressBarColor: Color(0xFF6F35A5),
+            thumbColor: Color(0xFF6F35A5),
+            baseBarColor: Color(0xFFDBC7ED),
+            thumbGlowColor: Color(0xFF6F35A5),
+            bufferedBarColor: Color(0xFFBF8EED),
+            progress: value.current,
+            buffered: value.buffered,
+            total: value.total,
+            onSeek: _pageManager.seek,
+          ),
         );
       },
     );

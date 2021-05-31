@@ -72,6 +72,10 @@ class _CardScreenState extends State<CardScreen> {
                   minHeight: MediaQuery.of(context).size.width * 0.8,
                   cardBuilder: (context, index) => !swipeLeft && !swipeRight && index == currIndex
                       ? Card(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16.0),
+                          ),
+                          elevation: 12,
                           child: new Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -145,6 +149,10 @@ class _CardScreenState extends State<CardScreen> {
                         )
                       : index != currIndex
                           ? Card(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16.0),
+                              ),
+                              elevation: 12,
                               child: new Column(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -199,6 +207,10 @@ class _CardScreenState extends State<CardScreen> {
                                     ).createShader(bounds);
                                   },
                                   child: Card(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16.0),
+                                    ),
+                                    elevation: 12,
                                     child: new Column(
                                       crossAxisAlignment: CrossAxisAlignment.center,
                                       mainAxisAlignment: MainAxisAlignment.center,
@@ -285,6 +297,10 @@ class _CardScreenState extends State<CardScreen> {
                                     ).createShader(bounds);
                                   },
                                   child: Card(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16.0),
+                                    ),
+                                    elevation: 12,
                                     child: new Column(
                                       crossAxisAlignment: CrossAxisAlignment.center,
                                       mainAxisAlignment: MainAxisAlignment.center,

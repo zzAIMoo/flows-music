@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flows/Screens/Login/login_screen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flows/Screens/Main/main_screen.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert' as convert;
 
 void main() => runApp(MyApp());
 
@@ -26,8 +22,10 @@ class _MyAppState extends State<MyApp> {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         buttonColor: Color(0xFF6F35A5),
-        highlightColor: Color(0xFF6F35A5),
+        highlightColor: Colors.transparent,
+        splashColor: Colors.transparent,
         focusColor: Color(0xFF6F35A5),
+        accentColor: Color(0xFF6F35A5),
         primaryColor: Color(0xFF6F35A5),
         scaffoldBackgroundColor: Colors.white,
       ),

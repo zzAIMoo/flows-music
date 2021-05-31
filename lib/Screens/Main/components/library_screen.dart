@@ -1,7 +1,6 @@
 import 'package:flows/Screens/Login/login_screen.dart';
 import 'package:flows/Screens/Main/components/playlist_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flows/components/rounded_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shimmer/shimmer.dart';
@@ -142,7 +141,15 @@ class _LibraryScreenState extends State<LibraryScreen> {
         tmp.forEach((element) {
           playlists.add(
             Card(
+              elevation: 6,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0),
+              ),
               child: InkWell(
+                borderRadius: BorderRadius.circular(15),
+                focusColor: Colors.grey[200],
+                highlightColor: Colors.grey[200],
+                splashColor: Colors.grey[200],
                 onTap: () async {
                   SharedPreferences prefs = await SharedPreferences.getInstance();
                   prefs.setString("playlist_name", element['playlist_name']).then((value) {

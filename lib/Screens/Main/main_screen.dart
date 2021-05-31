@@ -2,10 +2,7 @@ import 'package:flutter/material.dart';
 import 'components/search_screen.dart';
 import 'components/card_screen.dart';
 import 'components/library_screen.dart';
-import 'components/card_manager.dart';
 import 'package:flows/Screens/Settings/settings_screen.dart';
-import 'package:miniplayer/miniplayer.dart';
-//import 'package:image/image.dart' as IMG;
 
 class MainScreenPage extends StatefulWidget {
   @override
