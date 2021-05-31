@@ -95,18 +95,18 @@ class _BodyState extends State<Body> {
               isLoading: requestStarted,
               press: () async {
                 if (username.contains(" ")) {
-                  showToast("Lo username non può contenere spazi");
+                  showToast("The username can't contain spaces");
                   isUsernameValid = false;
-                } else if (psw.length < 8) {
-                  showToast("La password deve essere lunga almeno 8 caratteri");
+                } else if (psw.length < 9) {
+                  showToast("The password must be longer then 9 characters");
                   isPasswordValid = false;
                 }
                 if (username == "" || email == "" || psw == "") {
-                  showToast("Uno dei campi è vuoto");
+                  showToast("One of the fields is empty");
                   return;
                 } else if (!isEmailValid) {
                   isEmailValid = false;
-                  showToast("Formato email non valido");
+                  showToast("Email format is invalid");
                   setState(() {});
                   return;
                 }
@@ -120,12 +120,12 @@ class _BodyState extends State<Body> {
                   var responseParsed = convert.jsonDecode(response.body);
                   print(responseParsed["response_type"]);
                   if (responseParsed["response_type"] == "already_registered") {
-                    showToast("Mail/Username già utilizzati in un altro account");
+                    showToast("Mail/Username are already used in another account");
                     requestStarted = false;
                     setState(() {});
                     return;
                   } else if (responseParsed["response_type"] == "email_error") {
-                    showToast("Ci sono problemi con i server, si è pregati di riprovare più tardi");
+                    showToast("There are problems with the servers, please retry later");
                     requestStarted = false;
                     setState(() {});
                     return;

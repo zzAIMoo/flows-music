@@ -44,7 +44,7 @@ class _BodyState extends State<Body> {
         setState(() {});
         return;
       } else if (responseParsed["response_type"] == "error_in_retrieving") {
-        showToast("C'è stato un errore nella ricezione dei tuoi dati");
+        showToast("There has been an error in retrieving your data");
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('access_token', responseParsed["response_body"]["access_token"].toString());
         requestStarted = false;

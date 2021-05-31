@@ -358,7 +358,7 @@ class _SearchScreenState extends State<SearchScreen> {
           print(responseAddToPlaylist.body);
           var responseParsed = convert.jsonDecode(responseAddToPlaylist.body);
           if (responseParsed["response_type"] == "song_added_to_playlist") {
-            showToast("Song added correctly to your favourites");
+            showToast("Song added correctly to your favourites!");
           } else if (responseParsed["response_type"] == "error_in_adding") {
             showToast("There was an error adding the song, please retry");
           }
@@ -492,7 +492,7 @@ class _SearchScreenState extends State<SearchScreen> {
               }
               return;
             } else if (parsedAddSong["response_type"] == "artist_already_exists") {
-              showToast("L'artista già esiste, come hai datto ad ottenere questo errore");
+              showToast("The artist already exists, how did you get this error");
               SharedPreferences prefs = await SharedPreferences.getInstance();
               prefs.setString('access_token', parsedAddSong["response_body"]["access_token"].toString());
               downloadStarted = false;
@@ -500,7 +500,7 @@ class _SearchScreenState extends State<SearchScreen> {
               return;
             } else if (parsedAddSong["response_type"] == "song_already_exists") {
               downloadStarted = false;
-              showToast("La canzone già esiste sul database, come hai fatto ad ottenere questo errore");
+              showToast("The song is already on the database, how did you get this error");
               SharedPreferences prefs = await SharedPreferences.getInstance();
               prefs.setString('access_token', parsedAddSong["response_body"]["access_token"].toString());
               setState(() {});
@@ -578,7 +578,7 @@ class _SearchScreenState extends State<SearchScreen> {
             }
             return;
           } else if (parsedAddSong["response_type"] == "error_in_adding") {
-            showToast("C'è stato un errore nel download della canzone");
+            showToast("There has been an error in downloading the song");
             SharedPreferences prefs = await SharedPreferences.getInstance();
             prefs.setString('access_token', responseParsed["response_body"]["access_token"].toString());
             downloadStarted = false;
@@ -632,7 +632,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 }
                 return;
               } else if (parsedAddSong["response_type"] == "artist_already_exists") {
-                showToast("L'artista già esiste, come hai datto ad ottenere questo errore");
+                showToast("The artist already exists, how did you get this error");
                 SharedPreferences prefs = await SharedPreferences.getInstance();
                 prefs.setString('access_token', parsedAddSong["response_body"]["access_token"].toString());
                 downloadStarted = false;
@@ -641,10 +641,9 @@ class _SearchScreenState extends State<SearchScreen> {
                 return;
               } else if (parsedAddSong["response_type"] == "song_already_exists") {
                 downloadStarted = false;
-                showToast("La canzone già esiste sul database, come hai fatto ad ottenere questo errore");
+                showToast("The song is already on the database, how did you get this error");
                 SharedPreferences prefs = await SharedPreferences.getInstance();
                 prefs.setString('access_token', parsedAddSong["response_body"]["access_token"].toString());
-                print("lmao" + parsedAddSong);
                 setState(() {});
                 return;
               } else if (parsedAddSong["response_type"] == "access_token_expired") {

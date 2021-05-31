@@ -203,7 +203,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
         return;
       } else if (responseParsed["response_type"] == "error_in_retrieving") {
         print(responseParsed);
-        showToast("C'è stato un errore nella ricezione delle tue playlists");
+        showToast("There has been an error in retrieving your playlists");
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setString('access_token', responseParsed["response_body"]["access_token"].toString());
         requestStarted = false;
@@ -255,14 +255,14 @@ class _LibraryScreenState extends State<LibraryScreen> {
     if (response.statusCode == 200) {
       var responseParsed = convert.jsonDecode(response.body);
       if (responseParsed["response_type"] == "playlist_added") {
-        showToast("Playlist creata correttamente con il nome " + playlistName);
+        showToast("Playlist created correctly with the name: " + playlistName);
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('access_token', responseParsed["response_body"]["access_token"].toString());
         requestStarted = false;
         setState(() {});
         return;
       } else if (responseParsed["response_type"] == "error_in_adding") {
-        showToast("C'è stato un errore nella creazione della playlist");
+        showToast("There has been an error in creating the playlist, please retry");
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('access_token', responseParsed["response_body"]["access_token"].toString());
         requestStarted = false;

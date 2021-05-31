@@ -69,7 +69,7 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
           });
         } else if (responseParsed["response_type"] == "error_in_retrieving") {
           print(responseParsed);
-          showToast("C'è stato un errore nella ricezione delle tue playlists");
+          showToast("There has been an error in retrieving your playlists");
           SharedPreferences prefs = await SharedPreferences.getInstance();
           prefs.setString('access_token', responseParsed["response_body"]["access_token"].toString());
           requestStarted = false;

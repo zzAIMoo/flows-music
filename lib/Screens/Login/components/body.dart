@@ -7,7 +7,6 @@ import 'package:flows/components/rounded_button.dart';
 import 'package:flows/components/rounded_input_field.dart';
 import 'package:flows/components/rounded_password_field.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
@@ -136,12 +135,12 @@ class _BodyState extends State<Body> {
                 if (response.statusCode == 200) {
                   var responseParsed = convert.jsonDecode(response.body);
                   if (responseParsed["response_type"] == "error_logging_in") {
-                    showToast("C'è stato un errore nel login, si è pregati di riprovare con altri dati");
+                    showToast("There has been an error loggin in, please retry");
                     requestStarted = false;
                     setState(() {});
                     return;
                   } else if (responseParsed["response_type"] == "email_error") {
-                    showToast("Ci sono problemi con i server, si è pregati di riprovare più tardi");
+                    showToast("There are problems with the servers, please retry later");
                     requestStarted = false;
                     setState(() {});
                     return;
