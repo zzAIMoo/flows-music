@@ -10,6 +10,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 import 'package:crypto/crypto.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 List<YT_API> results = [];
 
@@ -22,26 +23,32 @@ class _SearchScreenState extends State<SearchScreen> {
   ScrollController _scrollController = new ScrollController();
   bool isPerformingRequest = false, downloadStarted = false, isPlaying = false;
   SearchBar searchBar;
-  static String key = "AIzaSyBgARzrg0k-ro-BbdTxYfWuwvNtIC6osXA";
+  static String key = "";
+  static String lastFmKey = "";
   String accessToken = "", refreshToken = "", lastSearch = "";
   CardManager _cardManager;
 
-  YoutubeAPI ytApi = YoutubeAPI(key, maxResults: 12, type: "video");
+  YoutubeAPI ytApi;
   List<YT_API> ytResult = [];
   List<bool> doesItExist = [];
   List<String> doesItExistString = [];
 
   void doStuff() async {
-    getSharedPrefs().then((value) async {
-      print(doesItExistString);
-      Future.forEach(doesItExistString, (element) {
-        if (element == "1") {
-          doesItExist.add(true);
-        } else {
-          doesItExist.add(false);
-        }
-      }).then((value) {
-        setState(() {});
+    dotenv.load(fileName: ".env").then((value) {
+      key = dotenv.env['YT_API_KEY'];
+      lastFmKey = dotenv.env['LAST_FM_API_KEY'];
+      ytApi = YoutubeAPI(key, maxResults: 12, type: "video");
+      getSharedPrefs().then((value) async {
+        print(doesItExistString);
+        Future.forEach(doesItExistString, (element) {
+          if (element == "1") {
+            doesItExist.add(true);
+          } else {
+            doesItExist.add(false);
+          }
+        }).then((value) {
+          setState(() {});
+        });
       });
     });
   }
@@ -436,7 +443,9 @@ class _SearchScreenState extends State<SearchScreen> {
     List<String> tags = [];
     var lastfmUrl = Uri.encodeFull("https://ws.audioscrobbler.com/2.0/?method=artist.gettoptags&autocorrect=1&artist=" +
         results[index].channelTitle.toLowerCase().replaceAll("vevo", "").replaceAll("- Topic", "") +
-        "&api_key=4d70550343db4aa79b0f2fc6c5a9867b&format=json&autocorrect=1");
+        "&api_key=" +
+        lastFmKey +
+        "&format=json&autocorrect=1");
     var responseFM = await http.get(lastfmUrl);
     if (responseFM.statusCode == 200) {
       var responseParsed = convert.jsonDecode(responseFM.body);
@@ -444,7 +453,9 @@ class _SearchScreenState extends State<SearchScreen> {
         results[index].title.split(" -").forEach((element) async {
           var url = Uri.encodeFull("https://ws.audioscrobbler.com/2.0/?method=artist.gettoptags&autocorrect=1artist=" +
               element.replaceAll(" ", "+") +
-              "&api_key=4d70550343db4aa79b0f2fc6c5a9867b&format=json&autocorrect=1");
+              "&api_key=" +
+              lastFmKey +
+              "&format=json&autocorrect=1");
           var responseInside = await http.get(url);
           if (responseInside.statusCode == 200) {
             var parsed = convert.jsonDecode(responseInside.body);
