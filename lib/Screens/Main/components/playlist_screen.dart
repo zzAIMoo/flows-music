@@ -129,6 +129,11 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(playlistName),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(30),
+          ),
+        ),
       ),
       body: Column(
         children: [

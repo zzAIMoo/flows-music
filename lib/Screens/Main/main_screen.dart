@@ -43,6 +43,11 @@ class _MainScreenPageState extends State<MainScreenPage> {
           ? null
           : _selectedIndex == 0
               ? AppBar(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.vertical(
+                      bottom: Radius.circular(30),
+                    ),
+                  ),
                   backgroundColor: Color(0xFF6F35A5),
                   actions: [
                     Row(
@@ -63,6 +68,11 @@ class _MainScreenPageState extends State<MainScreenPage> {
                 )
               : _selectedIndex == 2
                   ? AppBar(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.vertical(
+                          bottom: Radius.circular(30),
+                        ),
+                      ),
                       backgroundColor: Color(0xFF6F35A5),
                       actions: [
                         Row(

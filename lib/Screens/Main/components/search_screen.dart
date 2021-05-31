@@ -58,6 +58,11 @@ class _SearchScreenState extends State<SearchScreen> {
 
   AppBar buildAppBar(BuildContext context) {
     return new AppBar(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          bottom: Radius.circular(30),
+        ),
+      ),
       title: new Text('Cerca un media'),
       backgroundColor: Color(0xFF6F35A5),
       foregroundColor: Colors.white,
