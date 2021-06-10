@@ -140,15 +140,15 @@ class _MainScreenPageState extends State<MainScreenPage> {
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
-            label: 'Home',
+            label: 'Suggestions',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.search),
-            label: 'Ricerca',
+            label: 'Search',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.library_music_rounded),
-            label: 'Libreria',
+            label: 'Library',
           ),
         ],
         currentIndex: _selectedIndex,

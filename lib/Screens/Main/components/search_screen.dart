@@ -70,7 +70,7 @@ class _SearchScreenState extends State<SearchScreen> {
           bottom: Radius.circular(30),
         ),
       ),
-      title: new Text('Cerca un media'),
+      title: new Text('Search'),
       backgroundColor: Color(0xFF6F35A5),
       foregroundColor: Colors.white,
       actions: [!isPerformingRequest ? searchBar.getSearchAction(context) : Container()],
@@ -392,6 +392,7 @@ class _SearchScreenState extends State<SearchScreen> {
       },
     );
     if (responseCheckSong.statusCode == 200) {
+      print(responseCheckSong.body);
       var parsedCheckSong = convert.jsonDecode(responseCheckSong.body);
       if (parsedCheckSong["response_type"] == "song_exists") {
         doesItExist.add(true);

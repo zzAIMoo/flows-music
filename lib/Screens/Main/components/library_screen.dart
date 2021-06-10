@@ -133,6 +133,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
     print('Response status: ${response.statusCode}');
     print('Response body: ${response.body}');
     if (response.statusCode == 200) {
+      print(response.body);
       var responseParsed = convert.jsonDecode(response.body);
       print(responseParsed);
       if (responseParsed["response_type"] == "received_correctly") {
